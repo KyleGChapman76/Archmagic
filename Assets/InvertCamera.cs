@@ -6,11 +6,12 @@ public class InvertCamera : MonoBehaviour
 {
 	public bool invertX;
 	public bool invertY;
-    private Camera cameraToInvert; 
+    public Camera cameraToInvert; 
 
 	private void Start()
 	{
-		cameraToInvert = GetComponent<Camera>();
+		if (!cameraToInvert)
+			cameraToInvert = GetComponent<Camera>();
     }
 
 	private void OnPreCull()

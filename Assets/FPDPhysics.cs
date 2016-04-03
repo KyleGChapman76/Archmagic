@@ -24,7 +24,7 @@ public class FPDPhysics: MonoBehaviour
     public float maxAirSpeed = 20f;
     public float knockbackFactor = 1f;
     public float controlFactor = 1f;
-    public int controlFactorTimer = 0;
+    public float controlFactorTimer = 0;
 	public int knockedBackTimer;
     
 	// Small amounts of this results in bumping when walking down slopes, but large amounts results in falling too fast
@@ -110,8 +110,8 @@ public class FPDPhysics: MonoBehaviour
 		
 		if (controlFactorTimer > 0)
 		{
-			controlFactorTimer--;
-			if (controlFactorTimer == 0)
+			controlFactorTimer -= Time.deltaTime;
+			if (controlFactorTimer <= 0)
 			{
 				print("Resetting control factor.");
 				controlFactor = 1f;
@@ -233,7 +233,7 @@ public class FPDPhysics: MonoBehaviour
 			
 		print(controlFactor);
 		this.controlFactor = controlFactor;
-		controlFactorTimer = 5;
+		controlFactorTimer = 3;
 	}
 	
 	public void changeMultiplicativeMovementSpeed (float change)
