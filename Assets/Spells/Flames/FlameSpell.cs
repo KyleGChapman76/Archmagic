@@ -5,7 +5,6 @@ public class FlameSpell : MonoBehaviour
 {
 	private float timer;
 	
-	public GameObject prefab;
 	public float delay;
 	private int flameCount;
 	private float spread;
