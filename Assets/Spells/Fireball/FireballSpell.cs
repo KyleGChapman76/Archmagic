@@ -7,8 +7,6 @@ public class FireballSpell : MonoBehaviour
 	public CustomizedValue damage;
 	public CustomizedValue sizeMult;
 	public int ballDuration;
-	
-	public int stopTicks;
 
 	public GameObject fireballPrefab;
 	public float baseExplosionRadius;
@@ -17,11 +15,12 @@ public class FireballSpell : MonoBehaviour
 	{
 		//get targeting data
 		Vector3 forward = GetComponent<ProjectileTargeting>().GetDirection();
-		
+		Transform casterTransform = transform.root.transform;
+		SpellCasterInformation casterInformation = casterTransform.GetComponent<SpellCasterInformation>() as SpellCasterInformation;
+
 		//instantiate a fireball
-		Transform playerTransform = transform.root;
-		GameObject ball = Instantiate(fireballPrefab, playerTransform.position + Vector3.up + forward*.65f, playerTransform.rotation) as GameObject;
-		
+		GameObject ball = Instantiate(fireballPrefab, casterTransform.position + Vector3.up * casterInformation.spellCastingHeight + forward * casterInformation.spellCastingDistance, casterTransform.rotation) as GameObject;
+
 		//set the balls size and velocity, etc
 		ball.transform.localScale *= sizeMult.GetValue();
 		Rigidbody ballRB = ball.GetComponent<Rigidbody>();
@@ -35,5 +34,7 @@ public class FireballSpell : MonoBehaviour
         SphereCollider collider = ball.GetComponent<SphereCollider>() as SphereCollider;
 		collider.radius = .5f;
 		collider.isTrigger = true;
+
+		Physics.IgnoreCollision(collider, casterTransform.GetComponent<Collider>());
 	}
 }

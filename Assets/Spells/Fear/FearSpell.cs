@@ -5,8 +5,6 @@ public class FearSpell : MonoBehaviour
 {
 	public CustomizedValue slowPercent;
 	public CustomizedValue duration;
-	
-	public int stopTicks;
 
 	void Start ()
 	{
@@ -27,8 +25,6 @@ public class FearSpell : MonoBehaviour
 		
 		//put the player into animation and end the spell
 		Transform playerTransform = transform.root;
-		SpellHandler handler = (SpellHandler)playerTransform.GetComponent<SpellHandler>();
-		handler.ReportFrozenTime(stopTicks);
 		Destroy(gameObject);
 	}
 }

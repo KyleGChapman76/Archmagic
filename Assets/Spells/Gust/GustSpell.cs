@@ -38,24 +38,27 @@ public class GustSpell : MonoBehaviour
 				float horizChange = Random.Range(-.1F, .1F);
 				float vertChange = Random.Range(-.1F, .1F);
 
-				Transform playerTransform = this.transform.root;
-				SphereConversion converter = playerTransform.GetComponent<SphereConversion>();
-				Vector3 forward = converter.Convert(1F);
+				Transform casterTransform = this.transform.root;
+				SpellCasterInformation casterInformation = casterTransform.GetComponent<SpellCasterInformation>();
+				Vector3 forward = casterInformation.Convert(1F);
 
 				//instantiate a flame
-				GameObject flameCube = Instantiate(gustPrefab, playerTransform.position + Vector3.up * (1 + vertChange) + forward, playerTransform.rotation) as GameObject;
+				GameObject gustParticle = Instantiate(gustPrefab, casterTransform.position + Vector3.up * (1 + vertChange) + forward, casterTransform.rotation) as GameObject;
+				gustParticle.transform.localScale = Vector3.one * (.4f + Random.Range(0, .25f));
 
 				//set the flames size and velocity, etc
-				flameCube.transform.Rotate(converter.GetInclination(), 0, 0);
-				flameCube.GetComponent<Rigidbody>().velocity = playerTransform.GetComponent<CharacterController>().velocity;
-				flameCube.GetComponent<Rigidbody>().AddRelativeForce(Vector3.up * (20 + vertChange * spread));
-				flameCube.GetComponent<Rigidbody>().AddRelativeForce(Vector3.right * (horizChange * spread));
-				flameCube.GetComponent<Rigidbody>().AddForce(forward * force);
+				gustParticle.transform.Rotate(casterInformation.GetInclination(), 0, 0);
+				gustParticle.GetComponent<Rigidbody>().velocity = casterTransform.GetComponent<CharacterController>().velocity;
+				gustParticle.GetComponent<Rigidbody>().AddRelativeForce(Vector3.up * (20 + vertChange * spread));
+				gustParticle.GetComponent<Rigidbody>().AddRelativeForce(Vector3.right * (horizChange * spread));
+				gustParticle.GetComponent<Rigidbody>().AddForce(forward * force);
 
 				//set the flames other attributes
-				Gust gust = flameCube.GetComponent<Gust>() as Gust;
+				Gust gust = gustParticle.GetComponent<Gust>() as Gust;
 				gust.duration = gustDuration * (int)rangeValue.GetValue();
 				gust.increase = gustIncrease;
+
+				Physics.IgnoreCollision(gust.GetComponent<Collider>(), casterTransform.GetComponent<Collider>());
 			}
 		}
 	}

@@ -125,7 +125,7 @@ public class MagicHandler : MonoBehaviour
 			spell2BeingCast = true;
 
 		//activate combo spell
-		if (spell1BeingCast && spell2BeingCast && spellComboInstantiation == null && spellToCastCombo)
+		if (spell1BeingCast && spell2BeingCast && !spell1Instantiation && !spell2Instantiation && !spellComboInstantiation && spellToCastCombo)
 		{
 			print("Activating the combo spell!");
 			bool upgraded = selectedElement1 == selectedElement2;
@@ -145,7 +145,7 @@ public class MagicHandler : MonoBehaviour
 			}
         }
 		//activate spell 1
-		if (spell1BeingCast && !spell2BeingCast && spell1Instantiation == null && spellToCast1)
+		if (spell1BeingCast && (!spell2BeingCast || (spellStarting2 && spellStarting2.continuouslyActivated)) && !spell1Instantiation && spellToCast1)
 		{
 			print("Activating spell 1!");
 
@@ -161,7 +161,7 @@ public class MagicHandler : MonoBehaviour
 				playerArm1Animator.SetBool("ForceTransition", true);
 		}
 		//activate spell 2
-		if (!spell1BeingCast && spell2BeingCast && spell2Instantiation == null && spellToCast2)
+		if ((!spell1BeingCast || (spellStarting1 && spellStarting1.continuouslyActivated)) && spell2BeingCast && spell2Instantiation == null && spellToCast2)
 		{
 			print("Activating spell 2!");
 
@@ -302,6 +302,11 @@ public class MagicHandler : MonoBehaviour
 			handParticles1.transform.localScale = handSize;
 			handParticles1.transform.rotation = Quaternion.identity;
 			handParticles1.layer = LayerMask.NameToLayer("ViewModelsRight");
+			Transform[] handParticlesChildren = handParticles1.GetComponentsInChildren<Transform>() as Transform[];
+			foreach (Transform t in handParticlesChildren)
+			{
+				t.gameObject.layer = LayerMask.NameToLayer("ViewModelsRight");
+			}
         }
 		if (!handParticles2 || selectedElement2 != selected2Before)
 		{
@@ -312,6 +317,11 @@ public class MagicHandler : MonoBehaviour
 			handParticles2.transform.localScale = handSize;
 			handParticles2.transform.rotation = Quaternion.identity;
 			handParticles2.layer = LayerMask.NameToLayer("ViewModelsLeft");
+			Transform[] handParticlesChildren = handParticles2.GetComponentsInChildren<Transform>() as Transform[];
+			foreach (Transform t in handParticlesChildren)
+			{
+				t.gameObject.layer = LayerMask.NameToLayer("ViewModelsLeft");
+			}
 		}
 	}
 
@@ -362,8 +372,8 @@ public class MagicHandler : MonoBehaviour
 
 		bool validTarget = false;
 
-		SphereConversion sphereConverter = (SphereConversion)GetComponent<SphereConversion>();
-		Vector3 forward = sphereConverter.Convert(1f);
+		SpellCasterInformation casterInformation = GetComponent<SpellCasterInformation>() as SpellCasterInformation;
+		Vector3 forward = casterInformation.Convert(1f);
 
 		SpellTargetingType type = spellForTargeting.GetTargetType();
 		if (type.Equals(SpellTargetingType.Projectile))
@@ -505,14 +515,12 @@ public class MagicHandler : MonoBehaviour
 			if (spellInstantiation != null)
 			{
 				print("Successfully created spell instantiation!");
-			}
-			else
-			{
 				int initialManaCost = spellBeingActivated.GetManaCost();
 				if (upgrade)
 					initialManaCost = (int)(initialManaCost * UPGRADE_MANA_COST_INCREASE);
-                manaHandler.SpendMana(initialManaCost);
-            }
+				manaHandler.SpendMana(initialManaCost);
+			}
+
 			return spellInstantiation;
 		}
 		return null;

@@ -6,8 +6,6 @@ public class DecaySpell : MonoBehaviour
 	public CustomizedValue damage;
 	public CustomizedValue time;
 	
-	public int stopTicks;
-	
 	private void Start ()
 	{
 		//get the targeting data
@@ -27,8 +25,6 @@ public class DecaySpell : MonoBehaviour
 		
 		//put the player into animation and end the spell
 		Transform playerTransform = transform.root;
-		SpellHandler handler = (SpellHandler)playerTransform.GetComponent<SpellHandler>();
-		handler.ReportFrozenTime(stopTicks);
 		Destroy(gameObject);
 	}
 }

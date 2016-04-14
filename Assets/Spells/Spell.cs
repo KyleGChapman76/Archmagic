@@ -16,7 +16,7 @@ public class Spell : MonoBehaviour
 		ProjectileTargeting projectile = blueprint.GetComponent<ProjectileTargeting>();
 		AreaTargeting area = blueprint.GetComponent<AreaTargeting>();
 		UnitTargeting unit = blueprint.GetComponent<UnitTargeting>();
-		
+
 		if (projectile != null)
 			targetType = SpellTargetingType.Projectile;
 		else if (area != null)
@@ -24,7 +24,10 @@ public class Spell : MonoBehaviour
 		else if (unit != null)
 			targetType = SpellTargetingType.Unit;
 		else
+		{
 			targetType = SpellTargetingType.Null;
+			print("A spell could not find its targeting type!");
+		}
 	}
 	
 	//activate while targeting a direction
@@ -37,7 +40,7 @@ public class Spell : MonoBehaviour
 		}
 		
 		//create the actual spell behavior
-		GameObject obj = (GameObject)Instantiate(blueprint);
+		GameObject obj = Instantiate(blueprint) as GameObject;
 		obj.transform.parent = owner.transform;		
 
 		//set the customized values

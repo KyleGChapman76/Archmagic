@@ -16,27 +16,24 @@ public class RockSpell : MonoBehaviour
 		//get the targeting data
 		Vector3 forward = GetComponent<ProjectileTargeting>().GetDirection();
 		forward *= sizeMult.GetValue();
-		
+			
 		//instantiate a purely graphical boulder across the network
-		Transform playerTransform = transform.root;
-		GameObject boulder = Instantiate(rockPrefab, playerTransform.position + Vector3.up + forward, playerTransform.rotation) as GameObject;
-		
+		Transform casterTransform = transform.root;
+		GameObject boulder = Instantiate(rockPrefab, casterTransform.position + Vector3.up * 1.25f + forward * 1.25f, casterTransform.rotation) as GameObject;
+
 		//set the boulder's velocity, etc
-		boulder.GetComponent<Rigidbody>().velocity = playerTransform.GetComponent<CharacterController>().velocity;
+		Rigidbody boulderRB = boulder.GetComponent<Rigidbody>();
+		boulderRB.velocity = casterTransform.GetComponent<CharacterController>().velocity;
 		boulder.transform.localScale *= sizeMult.GetValue();
-		boulder.GetComponent<Rigidbody>().AddForce(forward*force.GetValue());
-		
+		boulderRB.AddForce(forward*force.GetValue()*2f);
+		float torqueRange = 100;
+        boulderRB.AddRelativeTorque(new Vector3(Random.Range(-torqueRange, torqueRange), Random.Range(-torqueRange, torqueRange), Random.Range(-torqueRange, torqueRange)));
+
 		//add the owner side components
-		RockProjectile projectile = (RockProjectile)boulder.AddComponent<RockProjectile>();
+		RockProjectile projectile = boulder.GetComponent<RockProjectile>();
 		projectile.damage = (int)damage.GetValue();
-		
-		SphereCollider collider = (SphereCollider)boulder.AddComponent<SphereCollider>();
-		collider.radius = .5f;
-		collider.isTrigger = true;
-		
-		//put the player into animation and end the spell
-		SpellHandler handler = (SpellHandler)playerTransform.GetComponent<SpellHandler>();
-		handler.ReportFrozenTime(stopTicks);
-		Destroy(this.gameObject);
+
+		Physics.IgnoreCollision(casterTransform.GetComponent<Collider>(), boulder.GetComponent<Collider>());
 	}
+
 }

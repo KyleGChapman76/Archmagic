@@ -11,9 +11,7 @@ public class BeamSpell : MonoBehaviour
 	
 	private Light light;
 	
-	private SphereConversion converter;
-	
-	public int stopTicks;
+	private SpellCasterInformation casterInformation;
 
 	private void Start ()
 	{
@@ -22,8 +20,6 @@ public class BeamSpell : MonoBehaviour
 	
 		//enter the player into animation
 		Transform playerTransform = transform.root;
-		SpellHandler spells = playerTransform.GetComponent<SpellHandler>();
-		spells.ReportFrozenTime(stopTicks);
 		
 		//find and destroy any currently present lights
 		Light presentLight = (Light)gameObject.GetComponent<Light>();
@@ -35,9 +31,9 @@ public class BeamSpell : MonoBehaviour
 		light.intensity = 1f;
 		light.range = range.GetValue();
 		light.spotAngle = radius.GetValue()*30f;
-		
+
 		//find the players sphere converter
-		converter = (SphereConversion)playerTransform.GetComponent<SphereConversion>();
+		casterInformation = playerTransform.GetComponent<SpellCasterInformation>() as SpellCasterInformation;
 	}
 	
 	private void FixedUpdate ()
@@ -52,6 +48,6 @@ public class BeamSpell : MonoBehaviour
 		transform.localPosition = new Vector3(0,.7f,0);
 		
 		//rotate our object to change the rotation of the light
-		transform.localRotation = Quaternion.Euler(new Vector3(converter.GetInclination(),0,0));
+		transform.localRotation = Quaternion.Euler(new Vector3(casterInformation.GetInclination(),0,0));
 	}
 }

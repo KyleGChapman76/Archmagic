@@ -42,14 +42,14 @@ public class FlameSpell : MonoBehaviour
 				float vertChange = Random.Range(-.1F, .1F);
 				
 				Transform playerTransform = this.transform.root;
-				SphereConversion converter = playerTransform.GetComponent<SphereConversion>();
-				Vector3 forward = converter.Convert(1F);
+				SpellCasterInformation casterInformation = playerTransform.GetComponent<SpellCasterInformation>();
+				Vector3 forward = casterInformation.Convert(1F);
 				
 				//instantiate a flame
 				GameObject flameCube = Instantiate(flamePrefab, playerTransform.position + Vector3.up*(1+vertChange) + forward, playerTransform.rotation) as GameObject;
 
 				//set the flames size and velocity, etc
-				flameCube.transform.Rotate(converter.GetInclination(), 0, 0);
+				flameCube.transform.Rotate(casterInformation.GetInclination(), 0, 0);
 				flameCube.GetComponent<Rigidbody>().velocity = playerTransform.GetComponent<CharacterController>().velocity;
 				flameCube.GetComponent<Rigidbody>().AddRelativeForce(Vector3.up*(20+vertChange*spread));
 				flameCube.GetComponent<Rigidbody>().AddRelativeForce(Vector3.right*(horizChange*spread));

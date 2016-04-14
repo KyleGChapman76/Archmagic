@@ -55,10 +55,12 @@ public class FPDPhysics: MonoBehaviour
     // If checked, then the player can change direction while in the air
     public bool airControl = true;
 
+	public bool floating = false;
+
 	private Vector3 moveDirection;
     private bool grounded = false;
     private float speed;
-	private bool jumping;
+	private float jumpAmount; //from .001 to 1
 	private float inputX;
 	private float inputY;
     private float fallStartLevel;
@@ -89,7 +91,7 @@ public class FPDPhysics: MonoBehaviour
 			inputY = fpdInput.GetInputY();
 			speed = fpdInput.IsWalking() ? walkSpeed : runSpeed;
 			speed *= Mathf.Max(0f, multiplicativeMovementSpeed);
-			jumping = fpdInput.IsJumping();
+			jumpAmount = fpdInput.IsJumping() ? 1 : 0;
 		}
 		else if (enemyAI != null)
 		{
@@ -97,7 +99,7 @@ public class FPDPhysics: MonoBehaviour
 			inputY = enemyAI.GetInputY();
 			speed = enemyAI.IsWalking() ? walkSpeed : runSpeed;
 			speed *= Mathf.Max(0f, multiplicativeMovementSpeed);
-			jumping = enemyAI.IsJumping();
+			jumpAmount = enemyAI.JumpAmount();
 		}
 		else
 		{
@@ -105,7 +107,7 @@ public class FPDPhysics: MonoBehaviour
 			inputX = 0;
 			inputY = 0;
 			speed = 0;
-			jumping = false;
+			jumpAmount = 0;
 		}
 		
 		if (controlFactorTimer > 0)
@@ -135,10 +137,10 @@ public class FPDPhysics: MonoBehaviour
 			}
 
 			// Jump! But only if the jump button has been released and player has been grounded for a given number of frames
-			if (jumping)
+			if (jumpAmount > 0)
 			{
 				velocity.x *= horizontalJumpMomentumRatio;
-				velocity.y = jumpSpeed;
+				velocity.y = jumpSpeed * jumpAmount;
 				velocity.z *= horizontalJumpMomentumRatio;
 			}
 			else
@@ -149,7 +151,15 @@ public class FPDPhysics: MonoBehaviour
 		else
 		{
 			// If we stepped over a cliff or something, set the height at which we started falling
-			if (!falling)
+			if (floating)
+			{
+				if (jumpAmount != 0)
+				{
+					velocity.y += jumpSpeed * jumpAmount * Time.deltaTime;
+				}
+				velocity.y *= (1-airDragPercent/100f);
+            }
+			else if (!falling)
 			{
 				falling = true;
 				fallStartLevel = transform.position.y;
@@ -158,11 +168,16 @@ public class FPDPhysics: MonoBehaviour
 		
 		//transform the moveDirection vector to the local axes
 		moveDirection = transform.TransformDirection(moveDirection);
-		
-		if (grounded) //grounded movement mechanics
+
+		if (!grounded)
+		{
+			velocity.y -= gravity * Time.deltaTime;
+		}
+
+		if (grounded || airControl) //grounded movement mechanics
 		{
 			Vector2 horizVelocity = new Vector2(velocity.x, velocity.z);
-		
+
 			if (controlFactor >= 1f)
 			{
 				velocity.x = moveDirection.x * speed;
@@ -172,19 +187,17 @@ public class FPDPhysics: MonoBehaviour
 			{
 				velocity.x += moveDirection.x * speed * controlFactor * controlFactor;
 				velocity.z += moveDirection.z * speed * controlFactor * controlFactor;
-				
-				float drag = slipperyDragPercent*controlFactor;
-				velocity.x *= (1-drag/100f);
-				velocity.z *= (1-drag/100f);
+
+				float drag = slipperyDragPercent * controlFactor;
+				velocity.x *= (1 - drag / 100f);
+				velocity.z *= (1 - drag / 100f);
 			}
 		}
 		else //air-strafing mechanics
 		{
-			velocity.y -= gravity * Time.deltaTime;
-			
 			Vector3 horizVel = new Vector3(velocity.x, 0, velocity.z);
 			Vector3 horizAccel = new Vector3(moveDirection.x, 0, moveDirection.z);
-			
+
 			Vector3 proj = Vector3.Project(horizVel, horizAccel);
 			if (proj.magnitude <= maxAirSpeed)
 			{

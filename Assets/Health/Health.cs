@@ -8,6 +8,8 @@ public class Health : MonoBehaviour
 	public bool  respawn;
 	public bool  allowOverheal;
 	public int maxOverhealedHealth;
+
+	public Mana mana;
 	
 	private int health;
 	
@@ -157,6 +159,8 @@ public class Health : MonoBehaviour
 		health = maxHealth;
 		transform.position = location.transform.position;
 		transform.rotation = location.transform.rotation;
+
+		mana.ResetMana();
 
 		FPDPhysics physics = GetComponent<FPDPhysics>();
         if (physics)

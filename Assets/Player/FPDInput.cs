@@ -64,8 +64,8 @@ public class FPDInput : MonoBehaviour
 		{
 			mouselook2.enabled = !flag;
 		}
-		SpellInput input = GetComponent<SpellInput>();
-		input.enabled = !flag;	
+		MagicHandler handler = GetComponent<MagicHandler>();
+		handler.enabled = !flag;	
 	}
 	
 	public bool IsInputDisabled ()

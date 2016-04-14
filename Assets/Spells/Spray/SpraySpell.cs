@@ -14,15 +14,15 @@ public class SpraySpell : MonoBehaviour
 	{
 		//get targeting data
 		Vector3 forward = GetComponent<ProjectileTargeting>().GetDirection();
+		Transform casterTransform = transform.root;
+		SpellCasterInformation casterInformation = casterTransform.GetComponent<SpellCasterInformation>() as SpellCasterInformation;
 
 		//instantiate a fireball
-		Transform playerTransform = transform.root;
-		GameObject ball = Instantiate(waterSprayPrefab, playerTransform.position + Vector3.up + forward * .65f, Quaternion.identity) as GameObject;
+		GameObject ball = Instantiate(waterSprayPrefab, casterTransform.position + Vector3.up * casterInformation.spellCastingHeight + forward * casterInformation.spellCastingDistance, Quaternion.identity) as GameObject;
 		ball.transform.localScale *= sizeMult.GetValue();
 
-		SphereConversion sphereConversion = playerTransform.GetComponent<SphereConversion>();
-		ball.transform.rotation = Quaternion.Euler(sphereConversion.GetInclination(), sphereConversion.GetAzimuth(), 0);
-		ball.GetComponent<Rigidbody>().velocity = playerTransform.GetComponent<FPDPhysics>().GetVelocity()*.6f;
+		ball.transform.rotation = Quaternion.Euler(casterInformation.GetInclination(), casterInformation.GetAzimuth(), 0);
+		ball.GetComponent<Rigidbody>().velocity = casterTransform.GetComponent<FPDPhysics>().GetVelocity()*.6f;
 
 		//initialize the projectile properties
 		WaterSprayer sprayer = ball.GetComponent<WaterSprayer>() as WaterSprayer;
@@ -31,5 +31,7 @@ public class SpraySpell : MonoBehaviour
 		sprayer.forwardsDirection = forward;
         sprayer.damageDealt = (int)force.GetValue();
 		sprayer.spraySystem.startSpeed = force.GetValue();
+
+		Physics.IgnoreCollision(ball.GetComponent<Collider>(), casterTransform.GetComponent<Collider>());
 	}
 }

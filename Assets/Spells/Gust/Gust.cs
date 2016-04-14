@@ -7,20 +7,28 @@ public class Gust : MonoBehaviour
 	public float duration;
 	public float increase;
 
+	public float horizontalKnockbackFactor;
+	public float verticalKnockbackFactor;
+
 	private void Start()
 	{
 		timer = 0;
 	}
 
-	private void OnCollisionEnter(Collision collision)
+	private void OnTriggerEnter(Collider collider)
 	{
+		if (collider.GetComponent<Gust>())
+			return;
+
 		if (enabled)
 			Destroy(gameObject);
 
-		GameObject obj = collision.gameObject;
-		if (obj.tag == "Enemy")
+		if (collider.tag == "Enemy")
 		{
-			//perform knockback
+			FPDPhysics physics = collider.GetComponent<FPDPhysics>();
+			Vector3 currentGustVelocity = GetComponent<Rigidbody>().velocity;
+			currentGustVelocity = new Vector3(currentGustVelocity.x*horizontalKnockbackFactor, currentGustVelocity.y * verticalKnockbackFactor, currentGustVelocity.z);
+			physics.Knockback(currentGustVelocity);
 		}
 	}
 
@@ -31,6 +39,9 @@ public class Gust : MonoBehaviour
 
 		timer += Time.deltaTime;
 		if (timer > duration)
+		{
+			gameObject.GetComponent<ParticleSystem>().Stop();
 			Destroy(gameObject);
+		}
 	}
 }

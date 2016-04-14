@@ -54,4 +54,9 @@ public class Mana : MonoBehaviour
 		regenTimer = -manaExhaustTime;
         return false;
     }
+
+	public void ResetMana()
+	{
+		currentMana = maxMana;
+	}
 }
