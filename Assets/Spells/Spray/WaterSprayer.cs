@@ -28,8 +28,7 @@ public class WaterSprayer : MonoBehaviour {
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		if (collider.tag.Equals("Player"))
-			return;
+		print(collider.name);
 
 		FPDPhysics physics = collider.GetComponent<FPDPhysics>();
 		if (physics)

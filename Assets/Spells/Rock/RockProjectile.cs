@@ -16,6 +16,7 @@ public class RockProjectile : MonoBehaviour
 	{
 		if (collider.isTrigger)
 			return;
+
 		if (enabled)
 		{
 			GameObject dustExplosion = Instantiate(rockDustExplosionPrefab, transform.position, Quaternion.identity) as GameObject;

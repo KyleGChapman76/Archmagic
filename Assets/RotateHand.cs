@@ -18,12 +18,14 @@ public class RotateHand : MonoBehaviour
 		startingXRot = startingRot.x;
 		startingYRot = startingRot.y;
 		startingZRot = startingRot.z;
+
+		rb = GetComponent<Rigidbody>();
 	}
 
 	private void Update ()
 	{
 		rb.angularVelocity = new Vector3(torqueX, torqueY, torqueZ);
-		rb.rotation = Quaternion.Euler(new Vector3(torqueX != 0 ? rb.rotation.x : startingXRot, torqueY != 0 ? rb.rotation.y : startingYRot, torqueZ != 0 ? rb.rotation.z : startingZRot));
+		rb.rotation = Quaternion.Euler(new Vector3(torqueX != 0 ? rb.rotation.eulerAngles.x : startingXRot, torqueY != 0 ? rb.rotation.eulerAngles.y : startingYRot, torqueZ != 0 ? rb.rotation.eulerAngles.z : startingZRot));
     }
 
 }

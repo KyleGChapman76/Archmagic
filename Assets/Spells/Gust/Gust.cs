@@ -20,16 +20,24 @@ public class Gust : MonoBehaviour
 		if (collider.GetComponent<Gust>())
 			return;
 
-		if (enabled)
-			Destroy(gameObject);
+		FPDPhysics physics = collider.GetComponent<FPDPhysics>();
+		Rigidbody rb = collider.GetComponent<Rigidbody>();
 
-		if (collider.tag == "Enemy")
+		Vector3 currentGustVelocity = GetComponent<Rigidbody>().velocity;
+		currentGustVelocity = new Vector3(currentGustVelocity.x * horizontalKnockbackFactor, currentGustVelocity.y * verticalKnockbackFactor, currentGustVelocity.z);
+
+		if (physics)
 		{
-			FPDPhysics physics = collider.GetComponent<FPDPhysics>();
-			Vector3 currentGustVelocity = GetComponent<Rigidbody>().velocity;
-			currentGustVelocity = new Vector3(currentGustVelocity.x*horizontalKnockbackFactor, currentGustVelocity.y * verticalKnockbackFactor, currentGustVelocity.z);
 			physics.Knockback(currentGustVelocity);
 		}
+		else if (rb)
+		{
+			print(collider.name);
+			rb.AddForce(currentGustVelocity*20);
+        }
+
+		if (enabled)
+			Destroy(gameObject);
 	}
 
 	private void Update()

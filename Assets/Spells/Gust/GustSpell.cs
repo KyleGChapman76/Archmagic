@@ -43,7 +43,7 @@ public class GustSpell : MonoBehaviour
 				Vector3 forward = casterInformation.Convert(1F);
 
 				//instantiate a flame
-				GameObject gustParticle = Instantiate(gustPrefab, casterTransform.position + Vector3.up * (1 + vertChange) + forward, casterTransform.rotation) as GameObject;
+				GameObject gustParticle = Instantiate(gustPrefab, casterTransform.position + Vector3.up * (casterInformation.spellCastingHeight + vertChange) + forward, casterTransform.rotation) as GameObject;
 				gustParticle.transform.localScale = Vector3.one * (.4f + Random.Range(0, .25f));
 
 				//set the flames size and velocity, etc

@@ -28,6 +28,8 @@ public class SimpleEnemyAI : MonoBehaviour
 	public float timeBetweenCasts;
 	private float spellTimer;
 
+	private GameObject spellInstantiation;
+
 	private void Start()
 	{
 		emissionHandler = GetComponent<PulsatingEmission>();
@@ -65,17 +67,30 @@ public class SimpleEnemyAI : MonoBehaviour
 			distanceToPlayer = Vector3.Distance(playerTarget.transform.position, transform.position);
 		}
 
-		if (playerTarget == null)
+		spellTimer += Time.deltaTime;
+        if (playerTarget == null)
 		{
 			spellTimer = 0;
+			if (spellInstantiation)
+				Destroy(spellInstantiation);
 		}
 		else
 		{
-			spellTimer += Time.deltaTime;
-			if (spellTimer > timeBetweenCasts && distanceToPlayer <= minDistanceForUseSpell)
+			if (distanceToPlayer <= minDistanceForUseSpell)
 			{
-				spellTimer = 0;
-				ActivateSpell((playerTarget.transform.position - transform.position).normalized, playerTarget.transform.position, playerTarget, false);
+				if (spellTimer > timeBetweenCasts)
+				{
+					spellTimer = 0;
+					spellInstantiation = ActivateSpell((playerTarget.transform.position - transform.position).normalized, playerTarget.transform.position, playerTarget, false);
+				}
+				else if (spellTimer > timeBetweenCasts /2f && spellInstantiation)
+				{
+					Destroy(spellInstantiation);
+				}
+			}
+			else if (spellInstantiation)
+			{
+				Destroy(spellInstantiation);
 			}
         }
 	}
