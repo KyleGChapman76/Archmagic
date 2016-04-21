@@ -40,17 +40,17 @@ public class FlameSpell : MonoBehaviour
 
 				float horizChange = Random.Range(-.1F, .1F);
 				float vertChange = Random.Range(-.1F, .1F);
-				
-				Transform playerTransform = this.transform.root;
-				SpellCasterInformation casterInformation = playerTransform.GetComponent<SpellCasterInformation>();
+
+				Transform casterTransform = transform.root.transform;
+				SpellCasterInformation casterInformation = casterTransform.GetComponent<SpellCasterInformation>() as SpellCasterInformation;
 				Vector3 forward = casterInformation.Convert(1F);
 				
 				//instantiate a flame
-				GameObject flameCube = Instantiate(flamePrefab, playerTransform.position + Vector3.up*(1+vertChange) + forward, playerTransform.rotation) as GameObject;
+				GameObject flameCube = Instantiate(flamePrefab, casterTransform.position + Vector3.up*(casterInformation.spellCastingHeight+ vertChange) + forward * casterInformation.spellCastingDistance, casterTransform.rotation) as GameObject;
 
 				//set the flames size and velocity, etc
 				flameCube.transform.Rotate(casterInformation.GetInclination(), 0, 0);
-				flameCube.GetComponent<Rigidbody>().velocity = playerTransform.GetComponent<CharacterController>().velocity;
+				flameCube.GetComponent<Rigidbody>().velocity = casterTransform.GetComponent<CharacterController>().velocity;
 				flameCube.GetComponent<Rigidbody>().AddRelativeForce(Vector3.up*(20+vertChange*spread));
 				flameCube.GetComponent<Rigidbody>().AddRelativeForce(Vector3.right*(horizChange*spread));
 				flameCube.GetComponent<Rigidbody>().AddForce(forward*force);
@@ -60,6 +60,8 @@ public class FlameSpell : MonoBehaviour
 				flame.damage = damage;
 				flame.duration = flameDuration * spreadValue.GetValue();
 				flame.increase = flameIncrease;
+
+				Physics.IgnoreCollision(flameCube.GetComponent<Collider>(), casterTransform.GetComponent<Collider>());
 			}
 		}
 	}

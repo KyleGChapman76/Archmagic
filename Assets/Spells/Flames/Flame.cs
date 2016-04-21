@@ -15,14 +15,13 @@ public class Flame : MonoBehaviour
 	
 	private void OnCollisionEnter (Collision collision)
 	{
-		if (enabled)
-			Destroy(gameObject);
-		
-		GameObject obj = collision.gameObject;
-		if (obj.tag == "Enemy")
+		Health health = collision.collider.GetComponent<Health>();
+		if (health)
 		{
-			obj.GetComponent<Health>().Damage(damage);
+			health.Damage(damage);
         }
+		if (enabled && !collision.collider.name.Equals(gameObject.name))
+			Destroy(gameObject);
 	}
 
 	private void Update ()

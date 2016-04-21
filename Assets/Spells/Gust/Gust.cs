@@ -32,7 +32,6 @@ public class Gust : MonoBehaviour
 		}
 		else if (rb)
 		{
-			print(collider.name);
 			rb.AddForce(currentGustVelocity*20);
         }
 

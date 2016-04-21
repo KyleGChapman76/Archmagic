@@ -10,6 +10,7 @@ public class MagicHandler : MonoBehaviour
 	public const int WATER_ELEMENT = 2;
 	public const int EARTH_ELEMENT = 3;
 	public const int AIR_ELEMENT = 4;
+	public float castingDelay = .1f;
 
 	public GameObject hand1;
 	public GameObject hand2;
@@ -57,13 +58,22 @@ public class MagicHandler : MonoBehaviour
 	public Color doubleSelectedColor = new Color(105f / 255f, 212f / 255f, 109f / 252f);
 
 	//whether the mouse input for the given hands is pressed or not
-	private bool spell1Input;
-	private bool spell2Input;
-	private bool comboInput;
+	private float handForSpell1Input;
+	private float handForSpell2Input;
 
-	//whether or not the given spell is actually being cast currently (or both for the combo spell)
-	private bool spell1BeingCast;
-	private bool spell2BeingCast;
+	//whether or not the given spell is selected by the player for casting now
+	private bool spell1Selected;
+	private bool spell2Selected;
+	private bool comboSpellSelected;
+
+	//whether or not the given spell is actually beginning to be cast
+	private bool spell1Beginning;
+	private bool spell2Beginning;
+	private bool spellComboBeginning;
+
+	//a timer to count down after the combo spell is activated
+	private float comboCooldownDuration = .4f;
+	private float comboCooldown;
 
 	//the instantiations of the spell objects when the spell is actually being cast
 	private GameObject spell1Instantiation;
@@ -107,34 +117,65 @@ public class MagicHandler : MonoBehaviour
 
 		MagicInput();
 
-		Spell spellStarting1 = comboInput ? spellToCastCombo : spellToCast1;
-		Spell spellStarting2 = comboInput ? spellToCastCombo : spellToCast2;
+		comboCooldown -= Time.deltaTime;
 
-		//tell the animators if the player is inputting for that arm or not
-		playerArm1Animator.SetBool("ArmInput", spell1Input);
-		playerArm2Animator.SetBool("ArmInput", spell2Input);
+		bool endOfCasting1 = (playerArm1Animator.GetCurrentAnimatorStateInfo(0).IsName("CastingAnimation") && playerArm1Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
+		bool endOfCasting2 = (playerArm2Animator.GetCurrentAnimatorStateInfo(0).IsName("CastingAnimation") && playerArm2Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
 
-		playerArm1Animator.SetBool("ContinuousSpell", spellStarting1 && spellStarting1.continuouslyActivated);
+		bool idling1 = playerArm1Animator.GetCurrentAnimatorStateInfo(0).IsName("IdleAnimation");
+		bool idling2 = playerArm2Animator.GetCurrentAnimatorStateInfo(0).IsName("IdleAnimation");
 
-		if (playerArm1Animator.GetCurrentAnimatorStateInfo(0).IsName("CastingAnimation") && playerArm1Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
-			spell1BeingCast = true;
+		//determine when a spell is beginning to be cast and inform the arms
+		if (idling1 && spell1Selected)
+		{
+			spell1Beginning = true;
+			playerArm1Animator.SetBool("ArmInput", true);
+			playerArm1Animator.SetBool("ContinuousSpell", spellToCast1.continuouslyActivated);
+		}
 
-		playerArm2Animator.SetBool("ContinuousSpell", spellStarting2 && spellStarting2.continuouslyActivated);
+		if (idling2 && spell2Selected)
+		{
+			spell2Beginning = true;
+			playerArm2Animator.SetBool("ArmInput", true);
+			playerArm1Animator.SetBool("ContinuousSpell", spellToCast2.continuouslyActivated);
+		}
 
-		if (playerArm2Animator.GetCurrentAnimatorStateInfo(0).IsName("CastingAnimation") && playerArm2Animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1)
-			spell2BeingCast = true;
+		if (idling1 && idling2 && comboSpellSelected && !spell1Beginning && !spell2Beginning)
+        {
+			spellComboBeginning = true;
+			playerArm1Animator.SetBool("ArmInput", true);
+			playerArm2Animator.SetBool("ArmInput", true);
+			playerArm1Animator.SetBool("ContinuousSpell", spellToCastCombo.continuouslyActivated);
+			playerArm2Animator.SetBool("ContinuousSpell", spellToCastCombo.continuouslyActivated);
+		}
+
+		if (spell1Beginning && !spell1Selected)
+		{
+			playerArm1Animator.SetBool("ArmInput", false);
+			spell1Beginning = false;
+		}
+
+		if (spell2Beginning && !spell2Selected)
+		{
+			playerArm2Animator.SetBool("ArmInput", false);
+			spell2Beginning = false;
+		}
+
+		if (spellComboBeginning && !comboSpellSelected)
+		{
+			playerArm1Animator.SetBool("ArmInput", false);
+			playerArm2Animator.SetBool("ArmInput", false);
+			spell1Beginning = false;
+			spell2Beginning = false;
+		}
 
 		//activate combo spell
-		if (spell1BeingCast && spell2BeingCast && !spell1Instantiation && !spell2Instantiation && !spellComboInstantiation && spellToCastCombo)
-		{
+		if (spellToCastCombo && spellComboBeginning && spellComboInstantiation == null && endOfCasting1 && endOfCasting2)
+		{	
 			print("Activating the combo spell!");
 			bool upgraded = selectedElement1 == selectedElement2;
 
-			try
-			{
-				spellComboInstantiation = TargetAndCast(spellToCastCombo, upgraded);
-			}
-			catch {}
+			spellComboInstantiation = TargetAndCast(spellToCastCombo, upgraded);
 			
 			if (spellToCastCombo.continuouslyActivated)
 				timeBetweenMana = 1f / spellToCastCombo.manaCost;
@@ -143,46 +184,64 @@ public class MagicHandler : MonoBehaviour
 				playerArm1Animator.SetBool("ForceTransition", true);
 				playerArm2Animator.SetBool("ForceTransition", true);
 			}
+
+			spellComboBeginning = false;
+			comboCooldown = comboCooldownDuration;
         }
 		//activate spell 1
-		if (spell1BeingCast && (!spell2BeingCast || (spellStarting2 && spellStarting2.continuouslyActivated)) && !spell1Instantiation && spellToCast1)
+		if (spellToCast1 && endOfCasting1 && spell1Instantiation == null && spellComboInstantiation == null && comboCooldown <= 0)
 		{
 			print("Activating spell 1!");
 
-			try
-			{
-				spell1Instantiation = TargetAndCast(spellToCast1, false);
-			}
-            catch { }
+			spell1Instantiation = TargetAndCast(spellToCast1, false);
 
 			if (spellToCast1.continuouslyActivated)
 				timeBetweenMana = 1f / spellToCast1.manaCost;
 			else
 				playerArm1Animator.SetBool("ForceTransition", true);
+
+			spell1Beginning = false;
 		}
 		//activate spell 2
-		if ((!spell1BeingCast || (spellStarting1 && spellStarting1.continuouslyActivated)) && spell2BeingCast && spell2Instantiation == null && spellToCast2)
+		if (spellToCast2 && endOfCasting2 && spell2Instantiation == null && spellComboInstantiation == null && comboCooldown <= 0)
 		{
 			print("Activating spell 2!");
 
-			try
-			{
-				spell2Instantiation = TargetAndCast(spellToCast2, false);
-			}
-			catch {}
-
+			spell2Instantiation = TargetAndCast(spellToCast2, false);
 
 			if (spellToCast2.continuouslyActivated)
 				timeBetweenMana = 1f / spellToCast2.manaCost;
 			else
 				playerArm2Animator.SetBool("ForceTransition", true);
+
+			spell2Beginning = false;
 		}
 
-		if (playerArm1Animator.GetCurrentAnimatorStateInfo(0).IsName("IdleAnimation"))
-			playerArm1Animator.SetBool("ForceTransition", false);
+		if (spell1Instantiation != null && endOfCasting1 && handForSpell1Input <= 0)
+		{
+			playerArm1Animator.SetBool("ForceTransition", true);
+		}
+		if (spell2Instantiation != null && endOfCasting2 && handForSpell2Input <= 0)
+		{
+			playerArm2Animator.SetBool("ForceTransition", true);
+		}
+		if (spellComboInstantiation != null && endOfCasting1 && (handForSpell1Input <= 0 || handForSpell2Input <= 0))
+		{
+			playerArm1Animator.SetBool("ForceTransition", true);
+			playerArm2Animator.SetBool("ForceTransition", true);
+		}
 
-		if (playerArm2Animator.GetCurrentAnimatorStateInfo(0).IsName("IdleAnimation"))
+		if (playerArm1Animator.GetCurrentAnimatorStateInfo(0).IsName("ReverseCastingAnimation"))
+		{
+			playerArm1Animator.SetBool("ArmInput", false);
+			playerArm1Animator.SetBool("ForceTransition", false);
+		}
+
+		if (playerArm2Animator.GetCurrentAnimatorStateInfo(0).IsName("ReverseCastingAnimation"))
+		{
+			playerArm2Animator.SetBool("ArmInput", false);
 			playerArm2Animator.SetBool("ForceTransition", false);
+		}
 
 		//deactivate spells
 		bool deactivatingSpell1 = false;
@@ -190,7 +249,8 @@ public class MagicHandler : MonoBehaviour
 		{
 			if (spell1Instantiation)
 				Destroy(spell1Instantiation);
-			spell1BeingCast = false;
+			else if (spellComboInstantiation)
+				Destroy(spellComboInstantiation);
 			deactivatingSpell1 = true;
         }
 
@@ -199,7 +259,8 @@ public class MagicHandler : MonoBehaviour
 		{
 			if (spell2Instantiation)
 				Destroy(spell2Instantiation);
-			spell2BeingCast = false;
+			else if (spellComboInstantiation)
+				Destroy(spellComboInstantiation);
 			deactivatingSpell2 = true;
         }
 
@@ -208,6 +269,7 @@ public class MagicHandler : MonoBehaviour
 			Destroy(spellComboInstantiation);
 		}
 
+		//if a spell is instantiated, spend mana over time
 		if (spell1Instantiation || spell2Instantiation || spellComboInstantiation)
 			manaTimer += Time.deltaTime;
 		else
@@ -229,9 +291,47 @@ public class MagicHandler : MonoBehaviour
 		int selected2Before = selectedElement2;
 
 		//arm animation inputs
-		spell1Input = Input.GetAxis("Fire2") == 1;
-		spell2Input = Input.GetAxis("Fire1") == 1;
-		comboInput = spell1Input && spell2Input;
+		if (Input.GetAxis("Fire2") == 1)
+			handForSpell1Input += Time.deltaTime;
+		else
+			handForSpell1Input = 0;
+
+		if (Input.GetAxis("Fire1") == 1)
+			handForSpell2Input += Time.deltaTime;
+		else
+			handForSpell2Input = 0;
+
+		//whether or not the player has put in the input to select the combo spell
+		if (handForSpell1Input <= 0 || handForSpell2Input <= 0)
+		{
+			comboSpellSelected = false;
+		}
+		else if ((handForSpell1Input > 0f && handForSpell1Input < castingDelay) && (handForSpell2Input > 0f && handForSpell2Input < castingDelay))
+		{
+			comboSpellSelected = true;
+		}
+
+		//whether or not the player has put in the input to select spell 1
+		if (handForSpell1Input > castingDelay && !(handForSpell2Input > 0f && handForSpell2Input < castingDelay))
+		{
+			spell1Selected = true;
+		}
+
+		if (handForSpell1Input <= 0 || comboSpellSelected)
+		{
+			spell1Selected = false;
+        }
+
+		//whether or not the player has put in the input to select spell 2
+		if (handForSpell2Input > castingDelay && !(handForSpell1Input > 0f && handForSpell1Input < castingDelay))
+		{
+			spell2Selected = true;
+		}
+
+		if (handForSpell2Input <= 0 || comboSpellSelected)
+		{
+			spell2Selected = false;
+		}
 
 		//element selection UX
 		for (int i = 1; i <= 4; i++)
@@ -241,11 +341,11 @@ public class MagicHandler : MonoBehaviour
 				int elementSelected = i;
 				if (elements[elementSelected - 1])
 				{
-					if (!spell1Input && selectedElement1 != elementSelected)
+					if (handForSpell1Input <= 0f && selectedElement1 != elementSelected)
 					{
 						selectedElement1 = elementSelected;
 					}
-					else if(!spell2Input)
+					else if(handForSpell2Input <= 0f)
 					{
 						selectedElement2 = elementSelected;
 					}
@@ -262,11 +362,11 @@ public class MagicHandler : MonoBehaviour
 
 			if (elements[slotSelected])
 			{
-				if (!spell1Input)
+				if (handForSpell1Input <= 0f)
 				{
 					selectedElement1 = slotSelected;
 				}
-				else if (!spell2Input)
+				else if (handForSpell2Input <= 0f)
 				{
 					selectedElement2 = slotSelected;
 				}
@@ -281,11 +381,11 @@ public class MagicHandler : MonoBehaviour
 
 			if (elements[slotSelected])
 			{
-				if (!spell1Input)
+				if (handForSpell1Input <= 0f)
 				{
 					selectedElement1 = slotSelected;
 				}
-				else if (!spell2Input)
+				else if (handForSpell2Input <= 0f)
 				{
 					selectedElement2 = slotSelected;
 				}
@@ -359,9 +459,6 @@ public class MagicHandler : MonoBehaviour
 	{
 		//for projectile targeting
 		Vector3 targetingDirection;
-
-		//for area targeting
-		float targetingRadius;
 
 		targetingDirection = Vector3.zero;
 
@@ -514,7 +611,6 @@ public class MagicHandler : MonoBehaviour
 
 			if (spellInstantiation != null)
 			{
-				print("Successfully created spell instantiation!");
 				int initialManaCost = spellBeingActivated.GetManaCost();
 				if (upgrade)
 					initialManaCost = (int)(initialManaCost * UPGRADE_MANA_COST_INCREASE);
