@@ -28,13 +28,9 @@ public class WaterSprayer : MonoBehaviour {
 
 	private void OnTriggerEnter(Collider collider)
 	{
-		print(collider.name);
-
 		FPDPhysics physics = collider.GetComponent<FPDPhysics>();
 		if (physics)
 		{
-			//physics.SetControlFactor(.8f);
-
 			MovementSlowDebuff currentDebuff = collider.GetComponent<MovementSlowDebuff>();
 			if (currentDebuff)
 			{
@@ -44,6 +40,7 @@ public class WaterSprayer : MonoBehaviour {
 			}
 			else
 			{
+				print("Slowing target for " + slowTime + " at efficacy " + slowdownPercent);
 				MovementSlowDebuff debuff = collider.gameObject.AddComponent<MovementSlowDebuff>() as MovementSlowDebuff;
 				debuff.duration = slowTime;
 				debuff.slowPercent = slowdownPercent;

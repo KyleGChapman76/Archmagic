@@ -10,6 +10,8 @@ public class Gust : MonoBehaviour
 	public float horizontalKnockbackFactor;
 	public float verticalKnockbackFactor;
 
+	public float damagePerHit;
+
 	private void Start()
 	{
 		timer = 0;
@@ -34,6 +36,12 @@ public class Gust : MonoBehaviour
 		{
 			rb.AddForce(currentGustVelocity*20);
         }
+
+		Health health = collider.GetComponent<Health>();
+		if (health != null && Random.Range(0, 1) > damagePerHit)
+		{
+			health.Damage(1);
+		}
 
 		if (enabled)
 			Destroy(gameObject);

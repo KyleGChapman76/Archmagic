@@ -8,6 +8,8 @@ public class SimpleEnemyAI : MonoBehaviour
 	public bool aggressive;
 	public float aggroDistance;
 	public float approachDistance;
+	public float visionRadius = .5f;
+	public LayerMask visionMask;
     public PulsatingEmission emissionHandler;
 	public Color nonaggroColor;
 	public Color aggroColor;
@@ -53,9 +55,15 @@ public class SimpleEnemyAI : MonoBehaviour
 		if (!playerTarget && aggressive)
 		{
 			GameObject propsectiveTarget = GameObject.FindGameObjectWithTag("Player");
-			if (propsectiveTarget != null && Vector3.Distance(transform.position, propsectiveTarget.transform.position) <= aggroDistance)
+			if (propsectiveTarget != null)
 			{
-				playerTarget = propsectiveTarget;
+				Ray rayToTarget = new Ray(transform.position, propsectiveTarget.transform.position - transform.position);
+				RaycastHit hitInfo;
+				if ((Physics.SphereCast(rayToTarget, visionRadius, out hitInfo, aggroDistance)) && (hitInfo.collider.gameObject == propsectiveTarget))
+				{
+					playerTarget = propsectiveTarget;
+					spellTimer = timeBetweenCasts;
+                }
 			}
 		}
 

@@ -21,11 +21,12 @@ public class MovementSlowDebuff : MonoBehaviour
 		physics.changeMultiplicativeMovementSpeed(-slowPercent/100f);
 	}
 	
-	private void FixedUpdate ()
+	private void Update ()
 	{
 		timer -= Time.deltaTime;
 		if (timer <= 0)
 		{
+			print("sdadaasads");
 			physics.changeMultiplicativeMovementSpeed(slowPercent/100f);
 			Destroy(this);
 		}

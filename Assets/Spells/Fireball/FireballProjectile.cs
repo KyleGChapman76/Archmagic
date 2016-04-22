@@ -19,16 +19,16 @@ public class FireballProjectile : MonoBehaviour
 	{
 		if (collider.isTrigger)
 			return;
-
-		if (enabled)
-			Destroy(gameObject);
 		
 		GameObject obj = collider.gameObject;
 		Health health = obj.GetComponent<Health>();
 		if (health != null)
 		{
-			health.Damage(damage);
+			health.Damage(damage/2);
 		}
+
+		if (enabled)
+			Destroy(gameObject);
 	}
 
 	private void FixedUpdate ()
