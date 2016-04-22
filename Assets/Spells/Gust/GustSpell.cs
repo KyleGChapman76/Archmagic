@@ -57,6 +57,7 @@ public class GustSpell : MonoBehaviour
 				Gust gust = gustParticle.GetComponent<Gust>() as Gust;
 				gust.duration = gustDuration * (int)rangeValue.GetValue();
 				gust.increase = gustIncrease;
+				gust.damagePerHit = .5f + speedValue.GetPoints() * .1f;
 
 				Physics.IgnoreCollision(gust.GetComponent<Collider>(), casterTransform.GetComponent<Collider>());
 			}

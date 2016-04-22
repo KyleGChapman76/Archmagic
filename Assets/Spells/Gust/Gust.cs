@@ -38,9 +38,10 @@ public class Gust : MonoBehaviour
         }
 
 		Health health = collider.GetComponent<Health>();
-		if (health != null && Random.Range(0, 1) > damagePerHit)
-		{
-			health.Damage(1);
+		if (health != null)
+		{	
+			if (Random.Range(0,100) < damagePerHit*100)
+				health.Damage(1);
 		}
 
 		if (enabled)
