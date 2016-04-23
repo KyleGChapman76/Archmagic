@@ -6,12 +6,17 @@ public class SteamCloud : MonoBehaviour
 	public int damage;
 	public float timer;
 	public float duration;
-	public float increase;
+	public float maxSize;
+	public float growthRate;
+	public float bouyancy;
+
+	private Rigidbody rb;
 
 	private void Start ()
 	{
 		timer = 0;
-	}
+		rb = GetComponent<Rigidbody>();
+    }
 	
 	private void OnCollisionEnter (Collision collision)
 	{
@@ -20,17 +25,20 @@ public class SteamCloud : MonoBehaviour
 		{
 			health.Damage(damage);
         }
-		if (enabled && !collision.collider.name.Equals(gameObject.name))
-			Destroy(gameObject);
 	}
 
 	private void Update ()
 	{
-		float inc = Time.deltaTime*increase;
-		transform.localScale += new Vector3(inc,inc,inc);
+		rb.AddForceAtPosition(-Physics.gravity * rb.mass * bouyancy * Time.deltaTime, transform.position);
 
 		timer += Time.deltaTime;
 		if (timer > duration)
 			Destroy(gameObject);
+	}
+
+	private void FixedUpdate()
+	{
+		float newLerpedSize = Mathf.Lerp(transform.localScale.x, maxSize, growthRate);
+		transform.localScale = Vector3.one * newLerpedSize;
 	}
 }

@@ -28,7 +28,10 @@ public class FireballProjectile : MonoBehaviour
 		}
 
 		if (enabled)
+		{
 			Destroy(gameObject);
+			print(collider.gameObject.layer);
+        }
 	}
 
 	private void FixedUpdate ()
