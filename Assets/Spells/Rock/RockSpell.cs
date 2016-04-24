@@ -6,8 +6,8 @@ public class RockSpell : MonoBehaviour
 	public CustomizedValue force;
 	public CustomizedValue damage;
 	public CustomizedValue sizeMult;
-	
-	public int stopTicks;
+
+	public float torqueRange;
 
 	public GameObject rockPrefab;
 
@@ -23,11 +23,10 @@ public class RockSpell : MonoBehaviour
 
 		//set the boulder's velocity, etc
 		Rigidbody boulderRB = boulder.GetComponent<Rigidbody>();
-		boulderRB.velocity = casterTransform.GetComponent<CharacterController>().velocity;
+		boulderRB.velocity = casterTransform.GetComponent<CharacterController>().velocity + Vector3.up;
 		boulder.transform.localScale *= sizeMult.GetValue();
 		boulderRB.AddForce(forward*force.GetValue()*2f);
-		float torqueRange = 100;
-        boulderRB.AddRelativeTorque(new Vector3(Random.Range(-torqueRange, torqueRange), Random.Range(-torqueRange, torqueRange), Random.Range(-torqueRange, torqueRange)));
+        boulderRB.AddTorque(new Vector3( Random.Range(torqueRange, torqueRange * 2f), Random.Range(-torqueRange, torqueRange), Random.Range(-torqueRange, torqueRange)));
 
 		//add the owner side components
 		RockProjectile projectile = boulder.GetComponent<RockProjectile>();

@@ -3,11 +3,16 @@ using System.Collections;
 
 public class FireballExplosion : MonoBehaviour
 {
-	public ParticleSystem particleSystem;
+	public ParticleSystem particles;
 
+	private void Start()
+	{
+		particles = GetComponent<ParticleSystem>();
+    }
+		
 	private void Update ()
 	{
-		if (!particleSystem || !particleSystem.IsAlive())
+		if (!particles || !particles.IsAlive())
 		{
 			Destroy(gameObject);
 		}

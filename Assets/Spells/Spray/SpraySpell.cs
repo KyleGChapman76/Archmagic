@@ -28,7 +28,7 @@ public class SpraySpell : MonoBehaviour
 		WaterSprayer sprayer = ball.GetComponent<WaterSprayer>() as WaterSprayer;
 		sprayer.slowdownPercent = slowdown.GetValue();
 		sprayer.duration = sprayDuration;
-		sprayer.forwardsDirection = forward;
+		sprayer.forwardsDirection = forward * force.GetValue();
         sprayer.damageDealt = (int)force.GetValue();
 		sprayer.spraySystem.startSpeed = force.GetValue();
 

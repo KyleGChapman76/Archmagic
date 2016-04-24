@@ -26,7 +26,6 @@ public class MovementSlowDebuff : MonoBehaviour
 		timer -= Time.deltaTime;
 		if (timer <= 0)
 		{
-			print("sdadaasads");
 			physics.changeMultiplicativeMovementSpeed(slowPercent/100f);
 			Destroy(this);
 		}

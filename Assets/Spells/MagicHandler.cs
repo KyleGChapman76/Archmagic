@@ -252,7 +252,8 @@ public class MagicHandler : MonoBehaviour
 			else if (spellComboInstantiation)
 				Destroy(spellComboInstantiation);
 			deactivatingSpell1 = true;
-        }
+			playerArm1Animator.SetBool("ContinuousSpell", false);
+		}
 
 		bool deactivatingSpell2 = false;
 		if (playerArm2Animator.GetCurrentAnimatorStateInfo(0).IsName("ReverseCastingAnimation"))
@@ -262,7 +263,8 @@ public class MagicHandler : MonoBehaviour
 			else if (spellComboInstantiation)
 				Destroy(spellComboInstantiation);
 			deactivatingSpell2 = true;
-        }
+			playerArm2Animator.SetBool("ContinuousSpell", false);
+		}
 
 		if (deactivatingSpell1 && deactivatingSpell2 && spellComboInstantiation)
 		{

@@ -17,6 +17,7 @@ public class WaterSprayer : MonoBehaviour {
 	{
 		timer = duration;
 		objectsPushed = new ArrayList();
+		GetComponent<Rigidbody>().velocity = forwardsDirection;
 	}
 
 	private void FixedUpdate()
@@ -55,7 +56,7 @@ public class WaterSprayer : MonoBehaviour {
 
 	private void AddObject(GameObject obj)
 	{
-		if (!obj.tag.Equals("Player") && !objectsPushed.Contains(obj))
+		if (!objectsPushed.Contains(obj))
 		{
 			print("Adding " + obj.name);
 			PushObject(obj);
@@ -66,8 +67,6 @@ public class WaterSprayer : MonoBehaviour {
 	private void PushObject(GameObject unit)
 	{
 		Vector3 knockbackDirection = forwardsDirection;
-		knockbackDirection.Normalize();
-		knockbackDirection *= (8f+damageDealt/4f);
 		Vector3 horiz = new Vector3(knockbackDirection.x, 0, knockbackDirection.z);
 		Vector3 modifiedKnockback = new Vector3(horiz.x, horiz.magnitude * vertFactor, horiz.z);
 

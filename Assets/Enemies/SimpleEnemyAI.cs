@@ -10,6 +10,8 @@ public class SimpleEnemyAI : MonoBehaviour
 	public float approachDistance;
 	public float visionRadius = .5f;
 	public LayerMask visionMask;
+	public float timeToLoseTarget;
+	private float missingTarget;
     public PulsatingEmission emissionHandler;
 	public Color nonaggroColor;
 	public Color aggroColor;
@@ -19,6 +21,7 @@ public class SimpleEnemyAI : MonoBehaviour
 	public float minDistanceForUseSpell;
 
 	private GameObject playerTarget;
+	private bool lostPlayerTarget;
 	private float distanceToPlayer;
 
 	public LayerMask groundMask;
@@ -52,17 +55,37 @@ public class SimpleEnemyAI : MonoBehaviour
 		}
 
 		//try to find player if havent targeted yet
-		if (!playerTarget && aggressive)
+		if (aggressive)
 		{
-			GameObject propsectiveTarget = GameObject.FindGameObjectWithTag("Player");
-			if (propsectiveTarget != null)
+			if (!playerTarget)
 			{
-				Ray rayToTarget = new Ray(transform.position, propsectiveTarget.transform.position - transform.position);
-				RaycastHit hitInfo;
-				if ((Physics.SphereCast(rayToTarget, visionRadius, out hitInfo, aggroDistance)) && (hitInfo.collider.gameObject == propsectiveTarget))
+				GameObject propsectiveTarget = GameObject.FindGameObjectWithTag("Player");
+				if (propsectiveTarget != null)
 				{
-					playerTarget = propsectiveTarget;
-					spellTimer = timeBetweenCasts;
+					Ray rayToTarget = new Ray(transform.position, propsectiveTarget.transform.position - transform.position);
+					RaycastHit hitInfo;
+					if ((Physics.SphereCast(rayToTarget, visionRadius, out hitInfo, aggroDistance)) && (hitInfo.collider.gameObject == propsectiveTarget))
+					{
+						playerTarget = propsectiveTarget;
+						lostPlayerTarget = false;
+						spellTimer = timeBetweenCasts/2f;
+					}
+				}
+			}
+			else
+			{
+				Ray rayToTarget = new Ray(transform.position, playerTarget.transform.position - transform.position);
+				RaycastHit hitInfo;
+				if (!((Physics.SphereCast(rayToTarget, visionRadius, out hitInfo, aggroDistance)) && (hitInfo.collider.gameObject == playerTarget)))
+				{
+					missingTarget += Time.deltaTime;
+				}
+
+				if (missingTarget > timeToLoseTarget)
+				{
+					missingTarget = 0;
+					playerTarget = null;
+					lostPlayerTarget = true;
                 }
 			}
 		}
@@ -115,9 +138,13 @@ public class SimpleEnemyAI : MonoBehaviour
 			float yInput = 1f - Mathf.Pow((aggroDistance - distanceToPlayer) / (aggroDistance - approachDistance), movementSpeedDecayFactor);
 			if (distanceToPlayer < approachDistance)
 			{
-				yInput = -1f/5 - .2f * Mathf.Sqrt(approachDistance - distanceToPlayer);
+				yInput = -1f / 5 - .2f * Mathf.Sqrt(approachDistance - distanceToPlayer);
 			}
-            return yInput;
+			return yInput;
+		}
+		else if (lostPlayerTarget)
+		{
+			return 1f;
 		}
 		else
 		{
@@ -127,7 +154,7 @@ public class SimpleEnemyAI : MonoBehaviour
 	
 	public bool IsWalking ()
 	{
-		return false;
+		return lostPlayerTarget;
 	}
 	
 	public float JumpAmount ()

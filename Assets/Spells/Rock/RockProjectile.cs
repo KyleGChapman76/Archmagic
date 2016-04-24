@@ -4,24 +4,47 @@ using System.Collections;
 public class RockProjectile : MonoBehaviour
 {
 	public int damage;
+	public float gravityValue;
 	public GameObject rockDustExplosionPrefab;
+	public GameObject smallRockPrefab;
+	public float smallRockSmallScale;
+	public float smallRockLargeScale;
+	public float smallRockHorizVel;
+	public float smallRockVertVel;
+	public float minNumRocks;
+	public float maxNumRocks;
+	public float velocityInheritance;
+
+	private Rigidbody rb;
 
 	private void FixedUpdate()
 	{
-		Rigidbody rb = GetComponent<Rigidbody>();
-		rb.AddForce(Physics.gravity * rb.mass * .5f);
+		rb = GetComponent<Rigidbody>();
+		rb.AddForce(Vector3.down * gravityValue);
 	}
 
-	private void OnTriggerEnter (Collider collider)
+	private void OnCollisionEnter (Collision collision)
 	{
+		Collider collider = collision.collider;
+
 		if (collider.isTrigger)
 			return;
 
 		if (enabled)
 		{
 			GameObject dustExplosion = Instantiate(rockDustExplosionPrefab, transform.position, Quaternion.identity) as GameObject;
-			dustExplosion.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity;
-            Destroy(gameObject);
+			dustExplosion.GetComponent<Rigidbody>().velocity = new Vector3(rb.velocity.x, 1 ,rb.velocity.z) * .1f;
+
+			int numRocks = (int)Random.Range(minNumRocks, maxNumRocks);
+			for (int i = 0; i < numRocks; i++)
+			{
+				GameObject smallRock = Instantiate(smallRockPrefab, transform.position, Quaternion.identity) as GameObject;
+				smallRock.transform.position = transform.position + Vector3.up * .2f;
+				smallRock.transform.localScale = new Vector3(Random.Range(smallRockSmallScale, smallRockLargeScale), Random.Range(smallRockSmallScale, smallRockLargeScale), Random.Range(smallRockSmallScale, smallRockLargeScale));
+				smallRock.GetComponent<Rigidbody>().velocity = new Vector3(Random.Range(-smallRockHorizVel, smallRockHorizVel) + rb.velocity.x * velocityInheritance, Random.Range(smallRockVertVel / 2, smallRockVertVel), Random.Range(-smallRockHorizVel, smallRockHorizVel) + rb.velocity.z*velocityInheritance);
+			}
+
+			Destroy(gameObject);
 		}
 		
 		GameObject obj = collider.gameObject;
@@ -32,7 +55,7 @@ public class RockProjectile : MonoBehaviour
 		}
 
 		FPDPhysics physics = collider.GetComponent<FPDPhysics>();
-		Rigidbody rb = collider.GetComponent<Rigidbody>();
+		Rigidbody collisionRB = collider.GetComponent<Rigidbody>();
 
 		Vector3 currentRockVelocity = GetComponent<Rigidbody>().velocity;
 
@@ -40,7 +63,7 @@ public class RockProjectile : MonoBehaviour
 		{
 			physics.Knockback(currentRockVelocity * 10);
 		}
-		else if (rb)
+		else if (collisionRB)
 		{
 			rb.AddForce(currentRockVelocity * 200);
 		}
