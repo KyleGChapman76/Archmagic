@@ -6,7 +6,6 @@ public class Mana : MonoBehaviour
 {
 	public int maxMana;
 	private int currentMana;
-	public Text manaText;
 	public Health healthManager;
 
 	public float manaGainPerSecond;
@@ -14,6 +13,13 @@ public class Mana : MonoBehaviour
 	public float manaRegainStopTime;
 	private float timeBetweenManaGain;
 	private float regenTimer;
+
+	public Text manaText;
+	public Image manaPanel;
+
+	public Color fullManaColor;
+	public Color lowManaColor;
+	public Color noManaColor;
 
 	private void Start ()
 	{
@@ -30,6 +36,31 @@ public class Mana : MonoBehaviour
 			GainMana(1);
 		}
 		manaText.text = currentMana + "";
+	}
+
+	private void OnGUI()
+	{
+		if (manaText != null)
+			manaText.text = currentMana.ToString();
+
+		if (manaPanel != null)
+		{
+			float percentMana = .2f + .8f * ((currentMana) / (float)maxMana);
+			percentMana = Mathf.Clamp(percentMana, 0f, 1f);
+
+			Color panelColor;
+
+			if (currentMana > 0)
+			{
+				panelColor = fullManaColor * percentMana + lowManaColor * (1 - percentMana);
+			}
+			else
+			{
+				panelColor = noManaColor;
+			}
+
+			manaPanel.color = panelColor;
+		}
 	}
 
 	public void GainMana(int manaGained)

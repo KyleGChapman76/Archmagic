@@ -11,6 +11,7 @@ public class SimpleEnemyAI : MonoBehaviour
 	public float visionRadius = .5f;
 	public LayerMask visionMask;
 	public float timeToLoseTarget;
+	public float durationOfSearch;
 	private float missingTarget;
     public PulsatingEmission emissionHandler;
 	public Color nonaggroColor;
@@ -19,10 +20,12 @@ public class SimpleEnemyAI : MonoBehaviour
 	public float aggroPulsation;
 
 	public float minDistanceForUseSpell;
+	public float leadTargetMod;
+	public float distanceLeadModDecayFactor;
 
 	private GameObject playerTarget;
 	private bool lostPlayerTarget;
-	private float distanceToPlayer;
+    private float distanceToPlayer;
 
 	public LayerMask groundMask;
 	public float hoverHeight;
@@ -43,7 +46,7 @@ public class SimpleEnemyAI : MonoBehaviour
 	private void Update ()
 	{
 		//set emission and light handler properties
-		if (playerTarget == null)
+		if (playerTarget == null && !lostPlayerTarget)
 		{
 			emissionHandler.colorOfEmission = nonaggroColor;
 			emissionHandler.pulsatingPeriod = nonaggroPulsation;
@@ -72,7 +75,7 @@ public class SimpleEnemyAI : MonoBehaviour
 					}
 				}
 			}
-			else
+			else if (!lostPlayerTarget)
 			{
 				Ray rayToTarget = new Ray(transform.position, playerTarget.transform.position - transform.position);
 				RaycastHit hitInfo;
@@ -88,6 +91,16 @@ public class SimpleEnemyAI : MonoBehaviour
 					lostPlayerTarget = true;
                 }
 			}
+
+			if (lostPlayerTarget)
+			{
+				missingTarget += Time.deltaTime;
+				if (missingTarget > durationOfSearch)
+				{
+					lostPlayerTarget = false;
+					missingTarget = 0f;
+                }
+			}
 		}
 
 		//look towards the player
@@ -98,6 +111,7 @@ public class SimpleEnemyAI : MonoBehaviour
 			distanceToPlayer = Vector3.Distance(playerTarget.transform.position, transform.position);
 		}
 
+		//spell casting logic
 		spellTimer += Time.deltaTime;
         if (playerTarget == null)
 		{
@@ -112,7 +126,9 @@ public class SimpleEnemyAI : MonoBehaviour
 				if (spellTimer > timeBetweenCasts)
 				{
 					spellTimer = 0;
-					spellInstantiation = ActivateSpell((playerTarget.transform.position - transform.position).normalized, playerTarget.transform.position, playerTarget, false);
+					float modifiedLeadTargetMod = leadTargetMod * Mathf.Pow(distanceToPlayer, distanceLeadModDecayFactor);
+                    Vector3 playerLeadPoint = playerTarget.transform.position + playerTarget.GetComponent<FPDPhysics>().GetVelocity() * modifiedLeadTargetMod;
+					spellInstantiation = ActivateSpell((playerLeadPoint - transform.position).normalized, playerLeadPoint, playerTarget, false);
 				}
 				else if (spellTimer > timeBetweenCasts /2f && spellInstantiation)
 				{

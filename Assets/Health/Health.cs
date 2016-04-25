@@ -10,8 +10,8 @@ public class Health : MonoBehaviour
 	public int maxOverhealedHealth;
 
 	public Mana mana;
-	
-	private int health;
+
+	private int currentHealth;
 	
 	private bool  alive;
 	
@@ -19,21 +19,24 @@ public class Health : MonoBehaviour
 
 	public Text healthText;
 	public Image healthPanel;
-	
+	public Color fullHealthColor;
+	public Color lowHealthColor;
+	public Color noHealthColor;
+
 	private void  Start ()
 	{
 		alive = true;
-		health = maxHealth;
+		currentHealth = maxHealth;
 	}
 
 	private void Update ()
 	{
 		if (Input.GetButtonDown("Damage"))
 		{
-			health -= 5;
+			currentHealth -= 5;
 		}
 
-		if (health <= 0)
+		if (currentHealth <= 0)
 			alive = false;
 		if (!alive)
 		{
@@ -47,19 +50,30 @@ public class Health : MonoBehaviour
 	private void OnGUI ()
 	{
 		if (healthText != null)
-			healthText.text = health.ToString();
+			healthText.text = currentHealth.ToString();
 
 		if (healthPanel != null)
 		{
-			float redFactor = .3f + .9f * (health / (float) maxHealth);
-            Color panelColor = new Color(1, redFactor, redFactor);
-            healthPanel.color = panelColor;
+			float percentHealth = .2f + .8f * ((currentHealth) / (float)maxHealth);
+			percentHealth = Mathf.Clamp(percentHealth, 0f, 1f);
+			Color panelColor;
+
+			if (currentHealth > 0)
+			{
+				panelColor = fullHealthColor * percentHealth + lowHealthColor * (1 - percentHealth);
+			}
+			else
+			{
+				panelColor = noHealthColor;
+            }
+
+			healthPanel.color = panelColor;
 		}
 	}
 
 	public int GetHealth ()
 	{
-		return health;
+		return currentHealth;
 	}
 	
 	public bool Kill ()
@@ -91,7 +105,7 @@ public class Health : MonoBehaviour
 			print("You are not allowed to heal with the damage function: " + gameObject.name);
 			return false;
 		}
-		health -= amount;
+		currentHealth -= amount;
 		return true;
 	}
 	
@@ -103,13 +117,13 @@ public class Health : MonoBehaviour
 			return false;
 		}
 		
-		health += amount;
+		currentHealth += amount;
 		
-		if (health > maxHealth && !allowOverheal)
-			health = maxHealth;
+		if (currentHealth > maxHealth && !allowOverheal)
+			currentHealth = maxHealth;
 			
-		if (health > maxOverhealedHealth && allowOverheal)
-			health = maxOverhealedHealth;
+		if (currentHealth > maxOverhealedHealth && allowOverheal)
+			currentHealth = maxOverhealedHealth;
 		
 		return true;
 	}
@@ -122,9 +136,9 @@ public class Health : MonoBehaviour
 			print("You are not allowed to damage with the heal function: " + gameObject.name);
 			return false;
 		}
-		health += amount;
-		if (health > maxOverhealedHealth)
-			health = maxOverhealedHealth;
+		currentHealth += amount;
+		if (currentHealth > maxOverhealedHealth)
+			currentHealth = maxOverhealedHealth;
 		return true;
 	}
 	
@@ -156,7 +170,7 @@ public class Health : MonoBehaviour
 			return;
 		
 		alive = true;
-		health = maxHealth;
+		currentHealth = maxHealth;
 		transform.position = location.transform.position;
 		transform.rotation = location.transform.rotation;
 
