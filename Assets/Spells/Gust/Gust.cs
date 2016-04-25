@@ -12,10 +12,16 @@ public class Gust : MonoBehaviour
 
 	public float damagePerHit;
 
+	public float velConservationOnHit;
+	public float velDeathThreshold;
+
+	private Rigidbody rb;
+
 	private void Start()
 	{
 		timer = 0;
-	}
+		rb = GetComponent<Rigidbody>();
+    }
 
 	private void OnTriggerEnter(Collider collider)
 	{
@@ -23,18 +29,18 @@ public class Gust : MonoBehaviour
 			return;
 
 		FPDPhysics physics = collider.GetComponent<FPDPhysics>();
-		Rigidbody rb = collider.GetComponent<Rigidbody>();
+		Rigidbody colliderRB = collider.GetComponent<Rigidbody>();
 
-		Vector3 currentGustVelocity = GetComponent<Rigidbody>().velocity;
-		currentGustVelocity = new Vector3(currentGustVelocity.x * horizontalKnockbackFactor, currentGustVelocity.y * verticalKnockbackFactor, currentGustVelocity.z);
+		Vector3 currentGustVelocity = rb.velocity;
+		currentGustVelocity = new Vector3(currentGustVelocity.x * horizontalKnockbackFactor, currentGustVelocity.y * verticalKnockbackFactor, currentGustVelocity.z * horizontalKnockbackFactor);
 
 		if (physics)
 		{
 			physics.Knockback(currentGustVelocity);
 		}
-		else if (rb)
+		else if (colliderRB)
 		{
-			rb.AddForce(currentGustVelocity*20);
+			colliderRB.AddForce(currentGustVelocity*20);
         }
 
 		Health health = collider.GetComponent<Health>();
@@ -44,8 +50,12 @@ public class Gust : MonoBehaviour
 				health.Damage(1);
 		}
 
-		if (enabled)
+
+		rb.velocity = rb.velocity * velConservationOnHit;
+		if (enabled && rb.velocity.magnitude < velDeathThreshold)
+		{
 			Destroy(gameObject);
+		}
 	}
 
 	private void Update()

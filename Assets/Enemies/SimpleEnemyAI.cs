@@ -38,7 +38,8 @@ public class SimpleEnemyAI : MonoBehaviour
 	public Spell spellCastAtPlayer;
 
 	public float timeBetweenCasts;
-	private float spellTimer;
+	public float percentTimeCasting;
+    private float spellTimer;
 
 	public float enemyTooCloseDistance;
 
@@ -85,7 +86,7 @@ public class SimpleEnemyAI : MonoBehaviour
 			}
 			else if (!lostPlayerTarget)
 			{
-				hoverHeight = playerTarget.transform.position.y - (transform.position.y - distanceFromGround) + 1f;
+				hoverHeight = playerTarget.transform.position.y - (transform.position.y - distanceFromGround) + 2f;
 				hoverHeight = Mathf.Clamp(hoverHeight, minimumHoverHeight, maximumHoverHeight);
 
 				Ray rayToTarget = new Ray(transform.position, playerTarget.transform.position - transform.position);
@@ -141,7 +142,7 @@ public class SimpleEnemyAI : MonoBehaviour
                     Vector3 playerLeadPoint = playerTarget.transform.position + playerTarget.GetComponent<FPDPhysics>().GetVelocity() * modifiedLeadTargetMod;
 					spellInstantiation = ActivateSpell((playerLeadPoint - transform.position).normalized, playerLeadPoint, playerTarget, false);
 				}
-				else if (spellTimer > timeBetweenCasts /2f && spellInstantiation)
+				else if (spellTimer > (timeBetweenCasts * percentTimeCasting) && spellInstantiation)
 				{
 					Destroy(spellInstantiation);
 				}
@@ -175,8 +176,6 @@ public class SimpleEnemyAI : MonoBehaviour
 				{
 					closestEnemy = obj;
 					closestDistance = distanceBetween;
-
-					print("Closests enemy is " + closestDistance + " away.");
                 }
             }
 		}
@@ -211,7 +210,7 @@ public class SimpleEnemyAI : MonoBehaviour
 		}
 		else if (lostPlayerTarget)
 		{
-			return 1f;
+			return .5f;
 		}
 		else
 		{
@@ -236,12 +235,6 @@ public class SimpleEnemyAI : MonoBehaviour
 				//float jumpAmount = Mathf.Pow((hoverHeight - hit1.distance)/hoverHeight, 1/2f);
 				//jumpAmount = Mathf.Clamp(jumpAmount,0,1);
 				return 1f;
-			}
-			else if (distanceFromGround > 2 * hoverHeight || controller.velocity.y > 5f)
-			{
-				//float jumpAmount = -Mathf.Pow((hit1.distance - hoverHeight)/hoverHeight, 1/2f);
-				//jumpAmount = Mathf.Clamp(jumpAmount, 0, 1);
-				return -1f;
 			}
 		}
 		return 0f;

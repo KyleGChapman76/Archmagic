@@ -52,8 +52,8 @@ public class FPDPhysics: MonoBehaviour
     
 	public float slideLimit;
  
-    // If checked, then the player can change direction while in the air
-    public bool airControl = true;
+    // the degree to which the object can accelerate directly in midair
+    public float airControl = 0f;
 
 	public bool floating = false;
 
@@ -82,7 +82,9 @@ public class FPDPhysics: MonoBehaviour
 	private void FixedUpdate()
 	{
 		// Move the controller, and set grounded true or false depending on whether we're standing on something
-		grounded = (controller.Move(velocity * Time.deltaTime) & CollisionFlags.Below) != 0;
+		CollisionFlags movementResult = controller.Move(velocity * Time.deltaTime);
+        grounded = (movementResult & CollisionFlags.Below) != 0;
+		bool hitCeiling = (movementResult & CollisionFlags.Above) != 0;
 
 		//get input balues either from the player or from AI
 		if (fpdInput != null)
@@ -150,20 +152,25 @@ public class FPDPhysics: MonoBehaviour
 		}
 		else
 		{
-			// If we stepped over a cliff or something, set the height at which we started falling
 			if (floating)
 			{
 				if (jumpAmount != 0)
 				{
 					velocity.y += jumpSpeed * jumpAmount * Time.deltaTime;
 				}
-				velocity.y *= (1-airDragPercent/100f);
+				velocity *= (1-airDragPercent/100f);
             }
-			else if (!falling)
+			else if (!falling) // If we stepped over a cliff or something, set the height at which we started falling
 			{
 				falling = true;
 				fallStartLevel = transform.position.y;
 			}
+
+			if (hitCeiling)
+			{
+				print("Stopping on ceiling!");
+				velocity.y *= 0f;
+            }
 		}
 		
 		//transform the moveDirection vector to the local axes
@@ -174,7 +181,7 @@ public class FPDPhysics: MonoBehaviour
 			velocity.y -= gravity * Time.deltaTime;
 		}
 
-		if (grounded || airControl) //grounded movement mechanics
+		if (grounded) //grounded movement mechanics
 		{
 			Vector2 horizVelocity = new Vector2(velocity.x, velocity.z);
 
@@ -182,6 +189,26 @@ public class FPDPhysics: MonoBehaviour
 			{
 				velocity.x = moveDirection.x * speed;
 				velocity.z = moveDirection.z * speed;
+			}
+			else
+			{
+				velocity.x += moveDirection.x * speed * controlFactor * controlFactor;
+				velocity.z += moveDirection.z * speed * controlFactor * controlFactor;
+
+				float drag = slipperyDragPercent * controlFactor;
+				velocity.x *= (1 - drag / 100f);
+				velocity.z *= (1 - drag / 100f);
+			}
+		}
+		else if (airControl > 0) //air movement mechanics
+		{
+			Vector2 horizVelocity = new Vector2(velocity.x, velocity.z);
+			speed *= airControl * .1f;
+
+			if (controlFactor >= 1f)
+			{
+				velocity.x += moveDirection.x * speed;
+				velocity.z += moveDirection.z * speed;
 			}
 			else
 			{
