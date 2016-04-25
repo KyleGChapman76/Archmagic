@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class SimpleEnemyAI : MonoBehaviour
 {
@@ -28,13 +29,18 @@ public class SimpleEnemyAI : MonoBehaviour
     private float distanceToPlayer;
 
 	public LayerMask groundMask;
-	public float hoverHeight;
-	public float movementSpeedDecayFactor;
+	public float minimumHoverHeight;
+	public float maximumHoverHeight;
+	private float hoverHeight;
+	private float distanceFromGround;
+    public float movementSpeedDecayFactor;
 
 	public Spell spellCastAtPlayer;
 
 	public float timeBetweenCasts;
 	private float spellTimer;
+
+	public float enemyTooCloseDistance;
 
 	private GameObject spellInstantiation;
 
@@ -62,6 +68,8 @@ public class SimpleEnemyAI : MonoBehaviour
 		{
 			if (!playerTarget)
 			{
+				hoverHeight = (minimumHoverHeight + maximumHoverHeight) / 2f;
+
 				GameObject propsectiveTarget = GameObject.FindGameObjectWithTag("Player");
 				if (propsectiveTarget != null)
 				{
@@ -77,6 +85,9 @@ public class SimpleEnemyAI : MonoBehaviour
 			}
 			else if (!lostPlayerTarget)
 			{
+				hoverHeight = playerTarget.transform.position.y - (transform.position.y - distanceFromGround) + 1f;
+				hoverHeight = Mathf.Clamp(hoverHeight, minimumHoverHeight, maximumHoverHeight);
+
 				Ray rayToTarget = new Ray(transform.position, playerTarget.transform.position - transform.position);
 				RaycastHit hitInfo;
 				if (!((Physics.SphereCast(rayToTarget, visionRadius, out hitInfo, aggroDistance)) && (hitInfo.collider.gameObject == playerTarget)))
@@ -142,8 +153,48 @@ public class SimpleEnemyAI : MonoBehaviour
         }
 	}
 
+	//strafe away from other enemies
 	public float GetInputX ()
 	{
+		GameObject[] otherEnemies = GameObject.FindGameObjectsWithTag("Enemy");
+
+		float closestDistance = float.MaxValue;
+		GameObject closestEnemy = null;
+
+		foreach (GameObject obj in otherEnemies)
+		{
+			if (obj == gameObject)
+				continue;
+
+			Vector3 horizPos = new Vector3(transform.position.x, 0, transform.position.z);
+			Vector3 objHorizPos = new Vector3(obj.transform.position.x, 0, obj.transform.position.z);
+			float distanceBetween = Vector3.Distance(horizPos, objHorizPos);
+            if (distanceBetween < enemyTooCloseDistance)
+			{
+				if (closestEnemy == null || distanceBetween < closestDistance)
+				{
+					closestEnemy = obj;
+					closestDistance = distanceBetween;
+
+					print("Closests enemy is " + closestDistance + " away.");
+                }
+            }
+		}
+
+		if (closestEnemy != null)
+		{
+			Vector3 horizPos = new Vector3(transform.position.x, 0, transform.position.z);
+			Vector3 objHorizPos = new Vector3(closestEnemy.transform.position.x, 0, closestEnemy.transform.position.z);
+			Vector3 vectorToClosestEnemy = objHorizPos - horizPos;
+
+			float angleLeft = Vector3.Angle(vectorToClosestEnemy, transform.rotation * Vector3.left);
+			float angleRight = Vector3.Angle(vectorToClosestEnemy, transform.rotation * Vector3.right);
+
+			float strafingSpeed = (angleLeft < angleRight ? -1f:1f) * (closestDistance - enemyTooCloseDistance);
+			strafingSpeed = Mathf.Clamp(strafingSpeed, 0, 1f);
+			return strafingSpeed;
+		}
+
 		return 0f;
 	}
 	
@@ -179,13 +230,14 @@ public class SimpleEnemyAI : MonoBehaviour
 		if (downwardsRaycast.Length > 0)
 		{
 			RaycastHit hit1 = downwardsRaycast[0];
-			if (hit1.distance < hoverHeight || controller.velocity.y < -5f)
+			distanceFromGround = hit1.distance;
+			if (distanceFromGround < hoverHeight || controller.velocity.y < -5f)
 			{
 				//float jumpAmount = Mathf.Pow((hoverHeight - hit1.distance)/hoverHeight, 1/2f);
 				//jumpAmount = Mathf.Clamp(jumpAmount,0,1);
 				return 1f;
 			}
-			else if (hit1.distance > 2 * hoverHeight || controller.velocity.y > 5f)
+			else if (distanceFromGround > 2 * hoverHeight || controller.velocity.y > 5f)
 			{
 				//float jumpAmount = -Mathf.Pow((hit1.distance - hoverHeight)/hoverHeight, 1/2f);
 				//jumpAmount = Mathf.Clamp(jumpAmount, 0, 1);

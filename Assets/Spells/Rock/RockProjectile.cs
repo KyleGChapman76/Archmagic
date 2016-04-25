@@ -61,7 +61,7 @@ public class RockProjectile : MonoBehaviour
 
 		if (physics)
 		{
-			physics.Knockback(currentRockVelocity * 10);
+			physics.Knockback(currentRockVelocity * 2);
 		}
 		else if (collisionRB)
 		{
