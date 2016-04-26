@@ -14,7 +14,7 @@ public class SimpleEnemyAI : MonoBehaviour
 	public float timeToLoseTarget;
 	public float durationOfSearch;
 	private float missingTarget;
-    public PulsatingEmission emissionHandler;
+    public Pulsate emissionHandler;
 	public Color nonaggroColor;
 	public Color aggroColor;
 	public float nonaggroPulsation;
@@ -47,7 +47,7 @@ public class SimpleEnemyAI : MonoBehaviour
 
 	private void Start()
 	{
-		emissionHandler = GetComponent<PulsatingEmission>();
+		emissionHandler = GetComponent<Pulsate>();
 	}
 	
 	private void Update ()

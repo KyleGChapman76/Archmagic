@@ -3,13 +3,14 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
 
+public enum MagicElement
+{
+	VOID, FIRE, WATER, EARTH, AIR
+}
+
 public class MagicHandler : MonoBehaviour
 {
 	public const float UPGRADE_MANA_COST_INCREASE = 2.0f;
-	public const int FIRE_ELEMENT = 1;
-	public const int WATER_ELEMENT = 2;
-	public const int EARTH_ELEMENT = 3;
-	public const int AIR_ELEMENT = 4;
 	public float castingDelay = .1f;
 
 	public GameObject hand1;
@@ -444,13 +445,13 @@ public class MagicHandler : MonoBehaviour
 	{
 		switch (element)
 		{
-			case FIRE_ELEMENT:
+			case (int)MagicElement.FIRE:
 				return firehandParticlePefab;
-			case WATER_ELEMENT:
+			case (int)MagicElement.WATER:
 				return waterhandParticlePefab;
-			case EARTH_ELEMENT:
+			case (int)MagicElement.EARTH:
 				return earthhandParticlePefab;
-			case AIR_ELEMENT:
+			case (int)MagicElement.AIR:
 				return airhandParticlePefab;
 		}
 		return airhandParticlePefab;

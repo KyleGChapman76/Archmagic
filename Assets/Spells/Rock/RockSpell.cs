@@ -17,7 +17,6 @@ public class RockSpell : MonoBehaviour
 		Vector3 forward = GetComponent<ProjectileTargeting>().GetDirection();
 		forward *= sizeMult.GetValue();
 			
-		//instantiate a purely graphical boulder across the network
 		Transform casterTransform = transform.root;
 		GameObject boulder = Instantiate(rockPrefab, casterTransform.position + Vector3.up * 1.25f + forward * 1.25f, casterTransform.rotation) as GameObject;
 
@@ -28,9 +27,12 @@ public class RockSpell : MonoBehaviour
 		boulderRB.AddForce(forward*force.GetValue()*2f);
         boulderRB.AddTorque(new Vector3( Random.Range(torqueRange, torqueRange * 2f), Random.Range(-torqueRange, torqueRange), Random.Range(-torqueRange, torqueRange)));
 
-		//add the owner side components
-		RockProjectile projectile = boulder.GetComponent<RockProjectile>();
-		projectile.damage = (int)damage.GetValue();
+		RockProjectile projectileRock = boulder.GetComponent<RockProjectile>();
+		LavaBombProjectile projectileBomb = boulder.GetComponent<LavaBombProjectile>();
+		if (projectileRock)
+			projectileRock.damage = (int)damage.GetValue();
+		if (projectileBomb)
+			projectileBomb.damage = (int)damage.GetValue();
 
 		Physics.IgnoreCollision(casterTransform.GetComponent<Collider>(), boulder.GetComponent<Collider>());
 	}

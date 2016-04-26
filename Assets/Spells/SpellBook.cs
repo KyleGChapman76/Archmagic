@@ -23,7 +23,7 @@ public class SpellBook : MonoBehaviour
 	{
 		foreach (Spell spell in GetComponents<Spell>())
 		{
-			if (Signature.Matches(signature, spell.signature))
+			if (Signature.Matches(signature, spell.GetSignature()))
 				return spell;
 		}
 		return null;

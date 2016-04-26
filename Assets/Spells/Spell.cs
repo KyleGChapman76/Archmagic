@@ -1,10 +1,14 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor;
 
+[CustomEditor(typeof(MagicElement))]
 public class Spell : MonoBehaviour
 {
 	public GameObject blueprint;
-	public int[] signature;
+
+	[SerializeField]
+	private int[] signature;
 	public int manaCost;
 	
 	private SpellTargetingType targetType;
@@ -367,5 +371,10 @@ public class Spell : MonoBehaviour
 		}
 		
 		return -1f;
+	}
+
+	public int[] GetSignature()
+	{
+		return signature;
 	}
 }

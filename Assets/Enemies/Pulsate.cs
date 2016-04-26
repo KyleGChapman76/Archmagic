@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class PulsatingEmission : MonoBehaviour {
+public class Pulsate : MonoBehaviour {
 
 	public Color colorOfEmission;
 	private Renderer renderer;
@@ -10,14 +10,19 @@ public class PulsatingEmission : MonoBehaviour {
 	private Light light;
 	public float maxEmission;
 	public float minEmission;
+	public float minSize;
+	public float maxSize;
 	public float pulsatingPeriod;
 	private float timer;
+
+	private Vector3 originalSize;
 
 	// Use this for initialization
 	void Start ()
 	{
 		renderer = GetComponent<Renderer>();
 		light = GetComponent<Light>();
+		originalSize = transform.localScale;
     }
 	
 	// Update is called once per frame
@@ -32,5 +37,9 @@ public class PulsatingEmission : MonoBehaviour {
 		renderer.material.SetColor("_EmissionColor", finalColor);
 		light.color = colorOfEmission;
 		light.intensity = minLight + (maxLight-minLight)*strength;
+
+		float size = minSize + strength * (maxSize - minSize);
+		transform.localScale = originalSize * size;
+		;
     }
 }

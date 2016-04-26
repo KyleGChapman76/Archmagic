@@ -109,7 +109,7 @@ public class Scroll
 		{
 			return new int[0] {};
 		}
-		return spell.signature;
+		return spell.GetSignature();
 	}
 	
 	public Spell ChangeSpell (int[] signature)
