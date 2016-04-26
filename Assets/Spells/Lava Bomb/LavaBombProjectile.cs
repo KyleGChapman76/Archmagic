@@ -29,7 +29,7 @@ public class LavaBombProjectile : MonoBehaviour {
 			Physics.Raycast(transform.position + Vector3.up*.5f, Vector3.down, out hit, 3f, groundMask);
 			if (hit.point != Vector3.zero)
 			{
-				GameObject lavaPool = Instantiate(lavaPoolPrefab, hit.point, Quaternion.identity) as GameObject;
+				GameObject lavaPool = Instantiate(lavaPoolPrefab, hit.point, Quaternion.Euler(0,Random.Range(0,360),0)) as GameObject;
 			}
 
 			Destroy(gameObject);

@@ -24,3 +24,7 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+
+# Archmagic Builds
+/archmagic_data/
+archmagic.exe

@@ -1,8 +1,5 @@
 using UnityEngine;
-using System.Collections.Generic;
-using UnityEditor;
 
-[CustomEditor(typeof(MagicElement))]
 public class Spell : MonoBehaviour
 {
 	public GameObject blueprint;
