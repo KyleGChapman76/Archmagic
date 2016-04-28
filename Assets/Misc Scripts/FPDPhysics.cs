@@ -275,9 +275,14 @@ public class FPDPhysics: MonoBehaviour
 		this.controlFactor = controlFactor;
 		controlFactorTimer = 3;
 	}
-	
-	public void changeMultiplicativeMovementSpeed (float change)
+
+	public void changeMultiplicativeMovementSpeed(float change)
 	{
 		multiplicativeMovementSpeed += change;
+	}
+
+	public float getMultiplicativeMovementSpeed()
+	{
+		return multiplicativeMovementSpeed;
 	}
 }

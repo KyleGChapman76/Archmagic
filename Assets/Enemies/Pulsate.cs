@@ -4,10 +4,10 @@ using System.Collections;
 public class Pulsate : MonoBehaviour {
 
 	public Color colorOfEmission;
-	private Renderer renderer;
+	private Renderer localRenderer;
 	public float minLight;
 	public float maxLight;
-	private Light light;
+	private Light pulsatingLight;
 	public float maxEmission;
 	public float minEmission;
 	public float minSize;
@@ -20,8 +20,8 @@ public class Pulsate : MonoBehaviour {
 	// Use this for initialization
 	void Start ()
 	{
-		renderer = GetComponent<Renderer>();
-		light = GetComponent<Light>();
+		localRenderer = GetComponent<Renderer>();
+		pulsatingLight = GetComponent<Light>();
 		originalSize = transform.localScale;
     }
 	
@@ -34,12 +34,13 @@ public class Pulsate : MonoBehaviour {
 		float emissionStrength = minEmission + (maxEmission - minEmission) * strength;
 		Color finalColor = colorOfEmission * Mathf.LinearToGammaSpace(emissionStrength);
 
-		renderer.material.SetColor("_EmissionColor", finalColor);
-		light.color = colorOfEmission;
-		light.intensity = minLight + (maxLight-minLight)*strength;
+		localRenderer.material.SetColor("_EmissionColor", finalColor);
+		pulsatingLight.color = colorOfEmission;
+		pulsatingLight.intensity = minLight + (maxLight-minLight)*strength;
 
 		float size = minSize + strength * (maxSize - minSize);
-		transform.localScale = originalSize * size;
-		;
+
+		if (float.IsNaN(originalSize.x) || float.IsNaN(originalSize.y) || float.IsNaN(originalSize.z))
+			transform.localScale = originalSize * size;
     }
 }

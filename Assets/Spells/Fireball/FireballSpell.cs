@@ -31,10 +31,7 @@ public class FireballSpell : MonoBehaviour
 		fireball.damage = (int)damage.GetValue();
 		fireball.duration = ballDuration;
 		fireball.explosionRadius = baseExplosionRadius * sizeMult.GetValue();
-        SphereCollider collider = ball.GetComponent<SphereCollider>() as SphereCollider;
-		collider.radius = .5f;
-		collider.isTrigger = true;
 
-		Physics.IgnoreCollision(collider, casterTransform.GetComponent<Collider>());
+		Physics.IgnoreCollision(ball.GetComponent<Collider>(), casterTransform.GetComponent<Collider>());
 	}
 }

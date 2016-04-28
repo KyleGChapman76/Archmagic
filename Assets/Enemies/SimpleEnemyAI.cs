@@ -29,7 +29,8 @@ public class SimpleEnemyAI : MonoBehaviour
     private float distanceToPlayer;
 
 	public LayerMask groundMask;
-	public float minimumHoverHeight;
+	public float maxDistanceToSeeGround;
+    public float minimumHoverHeight;
 	public float maximumHoverHeight;
 	private float hoverHeight;
 	private float distanceFromGround;
@@ -152,6 +153,14 @@ public class SimpleEnemyAI : MonoBehaviour
 				Destroy(spellInstantiation);
 			}
         }
+
+		//get distance from ground
+		Ray ray = new Ray(transform.position, Vector3.down);
+		RaycastHit hitInfo2;
+		if (Physics.Raycast(ray, out hitInfo2, maxDistanceToSeeGround, groundMask))
+		{
+			distanceFromGround = hitInfo2.distance;
+		}
 	}
 
 	//strafe away from other enemies
@@ -225,18 +234,16 @@ public class SimpleEnemyAI : MonoBehaviour
 	
 	public float JumpAmount ()
 	{
-		RaycastHit[] downwardsRaycast = Physics.RaycastAll(transform.position, Vector3.down, groundMask);
-		if (downwardsRaycast.Length > 0)
+		if (controller.velocity.y < -5f)
 		{
-			RaycastHit hit1 = downwardsRaycast[0];
-			distanceFromGround = hit1.distance;
-			if (distanceFromGround < hoverHeight || controller.velocity.y < -5f)
-			{
-				//float jumpAmount = Mathf.Pow((hoverHeight - hit1.distance)/hoverHeight, 1/2f);
-				//jumpAmount = Mathf.Clamp(jumpAmount,0,1);
-				return 1f;
-			}
+			return 1f;
 		}
+
+        if (distanceFromGround < hoverHeight)
+		{
+			return GetComponent<FPDPhysics>().getMultiplicativeMovementSpeed();
+		}
+
 		return 0f;
 	}
 
