@@ -32,12 +32,12 @@ public class FlameSpell : MonoBehaviour
 	private void Update ()
 	{
 		timer += Time.deltaTime;
-		for (int i = 0;i<flameCount;i++)
+		
+		if (timer >= delay)
 		{
-			if (timer >= delay)
+			timer = 0;
+			for (int i = 0; i < flameCount; i++)
 			{
-				timer = 0;
-
 				float horizChange = Random.Range(-.1F, .1F);
 				float vertChange = Random.Range(-.1F, .1F);
 

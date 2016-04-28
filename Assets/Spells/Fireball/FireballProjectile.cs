@@ -15,12 +15,9 @@ public class FireballProjectile : MonoBehaviour
 		timer = 0;
 	}
 
-	private void OnTriggerEnter (Collider collider)
+	private void OnCollisionEnter (Collision collision)
 	{
-		if (collider.isTrigger)
-			return;
-		
-		GameObject obj = collider.gameObject;
+		GameObject obj = collision.gameObject;
 		Health health = obj.GetComponent<Health>();
 		if (health != null)
 		{

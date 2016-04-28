@@ -58,7 +58,6 @@ public class WaterSprayer : MonoBehaviour {
 	{
 		if (!objectsPushed.Contains(obj))
 		{
-			print("Adding " + obj.name);
 			PushObject(obj);
 			objectsPushed.Add(obj);
 		}
