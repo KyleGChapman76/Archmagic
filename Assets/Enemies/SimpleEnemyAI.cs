@@ -49,7 +49,8 @@ public class SimpleEnemyAI : MonoBehaviour
 	private void Start()
 	{
 		emissionHandler = GetComponent<Pulsate>();
-	}
+		controller = GetComponent<CharacterController>();
+    }
 	
 	private void Update ()
 	{
@@ -210,10 +211,20 @@ public class SimpleEnemyAI : MonoBehaviour
 	{
 		if (playerTarget)
 		{
-			float yInput = 1f - Mathf.Pow((aggroDistance - distanceToPlayer) / (aggroDistance - approachDistance), movementSpeedDecayFactor);
+			float yInput = .5f;
+			if (distanceToPlayer < aggroDistance)
+			{
+				yInput = 1f - Mathf.Pow((aggroDistance - distanceToPlayer) / (aggroDistance - approachDistance), movementSpeedDecayFactor);
+			}
 			if (distanceToPlayer < approachDistance)
 			{
 				yInput = -1f / 5 - .2f * Mathf.Sqrt(approachDistance - distanceToPlayer);
+			}
+			if (float.IsNaN(yInput))
+			{
+				print(Mathf.Sqrt(approachDistance - distanceToPlayer) + ", " + approachDistance + ", " + distanceToPlayer);
+				print(Mathf.Pow((aggroDistance - distanceToPlayer) / (aggroDistance - approachDistance), movementSpeedDecayFactor) + ", " + (aggroDistance - distanceToPlayer) / (aggroDistance - approachDistance) + ", " + movementSpeedDecayFactor);
+				return 0f;
 			}
 			return yInput;
 		}

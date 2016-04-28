@@ -6,7 +6,8 @@ public class Health : MonoBehaviour
 {
 	public int maxHealth;
 	public bool  respawn;
-	public bool  allowOverheal;
+	public float timeToRespawn;
+    public bool  allowOverheal;
 	public int maxOverhealedHealth;
 
 	public Mana mana;
@@ -15,13 +16,15 @@ public class Health : MonoBehaviour
 	
 	private bool  alive;
 	
-	private static RespawnLocation[] locations;
+	private static GameObject[] locations;
 
 	public Text healthText;
 	public Image healthPanel;
 	public Color fullHealthColor;
 	public Color lowHealthColor;
 	public Color noHealthColor;
+
+	public GameObject playerCamera;
 
 	private void  Start ()
 	{
@@ -41,7 +44,10 @@ public class Health : MonoBehaviour
 		if (!alive)
 		{
 			if (respawn)
-				Respawn();
+			{
+				Invoke("Respawn", timeToRespawn);
+				GetComponent<FPDInput>().DisableInput(true);
+			}
 			else
 				Destroy(gameObject);
 		}
@@ -142,15 +148,9 @@ public class Health : MonoBehaviour
 		return true;
 	}
 	
-	public static RespawnLocation GetRespawnLocation()
+	public static GameObject GetRespawnLocation()
 	{
-		GameObject[] array = GameObject.FindGameObjectsWithTag("Respawn");
-		locations = new RespawnLocation[array.Length];
-		for (int i = 0;i<array.Length;i++)
-		{
-			RespawnLocation location = array[i].GetComponent<RespawnLocation>();
-			locations[i] = location;
-		}
+		locations = GameObject.FindGameObjectsWithTag("Respawn");
 	
 		if (locations.Length == 0)
 		{
@@ -164,7 +164,7 @@ public class Health : MonoBehaviour
 	
 	public void Respawn ()
 	{
-		RespawnLocation location = GetRespawnLocation();
+		GameObject location = GetRespawnLocation();
 		
 		if (location == null)
 			return;
@@ -173,6 +173,7 @@ public class Health : MonoBehaviour
 		currentHealth = maxHealth;
 		transform.position = location.transform.position;
 		transform.rotation = location.transform.rotation;
+		playerCamera.transform.rotation = location.transform.rotation;
 
 		mana.ResetMana();
 
@@ -181,5 +182,17 @@ public class Health : MonoBehaviour
 		{
 			physics.SetVelocity(Vector3.zero);
         }
+
+		Rigidbody rb = GetComponent<Rigidbody>();
+		if (rb)
+		{
+			rb.rotation = location.transform.rotation;
+        }
+
+		FPDInput input = GetComponent<FPDInput>();
+		if (input)
+		{
+			input.DisableInput(false);
+		}
 	}
 }
