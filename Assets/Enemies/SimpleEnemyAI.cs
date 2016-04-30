@@ -252,7 +252,7 @@ public class SimpleEnemyAI : MonoBehaviour
 
         if (distanceFromGround < hoverHeight)
 		{
-			return GetComponent<FPDPhysics>().getMultiplicativeMovementSpeed();
+			return GetComponent<FPDPhysics>().GetMultiplicativeMovementSpeed();
 		}
 
 		return 0f;

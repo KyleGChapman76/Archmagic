@@ -181,6 +181,7 @@ public class Health : MonoBehaviour
         if (physics)
 		{
 			physics.SetVelocity(Vector3.zero);
+			physics.ResetMultiplicativeMovementSpeed();
         }
 
 		Rigidbody rb = GetComponent<Rigidbody>();

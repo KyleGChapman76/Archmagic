@@ -562,8 +562,7 @@ public class MagicHandler : MonoBehaviour
 
 			if (elements[i])
 			{
-				spellSlotText.color = Color.black;
-				spellSlotText.fontSize = 18;
+				spellSlotText.fontSize = 24;
 				if (selected1 && selected2)
 					spellSlotImage.color = doubleSelectedColor;
 				else
@@ -572,8 +571,7 @@ public class MagicHandler : MonoBehaviour
 			else
 			{
 				spellSlotText.text = "";
-				spellSlotText.color = Color.grey;
-				spellSlotText.fontSize = 16;
+				spellSlotText.fontSize = 18;
 				spellSlotImage.color = Color.grey;
 			}
 

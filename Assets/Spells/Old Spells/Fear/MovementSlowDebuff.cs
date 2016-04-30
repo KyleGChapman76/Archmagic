@@ -18,7 +18,7 @@ public class MovementSlowDebuff : MonoBehaviour
 		timer = duration;
 		physics = GetComponent<FPDPhysics>() as FPDPhysics;
 		
-		physics.changeMultiplicativeMovementSpeed(-slowPercent/100f);
+		physics.ChangeMultiplicativeMovementSpeed(-slowPercent/100f);
 	}
 	
 	private void Update ()
@@ -26,14 +26,14 @@ public class MovementSlowDebuff : MonoBehaviour
 		timer -= Time.deltaTime;
 		if (timer <= 0)
 		{
-			physics.changeMultiplicativeMovementSpeed(slowPercent/100f);
+			physics.ChangeMultiplicativeMovementSpeed(slowPercent/100f);
 			Destroy(this);
 		}
 	}
 
 	public void Reset()
 	{
-		physics.changeMultiplicativeMovementSpeed(slowPercent / 100f);
+		physics.ChangeMultiplicativeMovementSpeed(slowPercent / 100f);
 		Start();
 	}
 }

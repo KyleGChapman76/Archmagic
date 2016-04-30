@@ -29,10 +29,16 @@ public class RockSpell : MonoBehaviour
 
 		RockProjectile projectileRock = boulder.GetComponent<RockProjectile>();
 		LavaBombProjectile projectileBomb = boulder.GetComponent<LavaBombProjectile>();
+		MudBallProjectile mudBallProjectile = boulder.GetComponent<MudBallProjectile>();
 		if (projectileRock)
 			projectileRock.damage = (int)damage.GetValue();
 		if (projectileBomb)
 			projectileBomb.damage = (int)damage.GetValue();
+		if (mudBallProjectile)
+		{
+			mudBallProjectile.damage = (int)damage.GetValue();
+			mudBallProjectile.slowPercent = 4*(int)damage.GetValue();
+		}
 
 		Physics.IgnoreCollision(casterTransform.GetComponent<Collider>(), boulder.GetComponent<Collider>());
 	}
