@@ -108,7 +108,6 @@ public class Health : MonoBehaviour
 	{
 		if (amount < 0)
 		{
-			print("You are not allowed to heal with the damage function: " + gameObject.name);
 			return false;
 		}
 		currentHealth -= amount;
@@ -119,10 +118,14 @@ public class Health : MonoBehaviour
 	{
 		if (amount < 0)
 		{
-			print("You are not allowed to damage with the heal function: " + gameObject.name);
 			return false;
 		}
-		
+
+		if (currentHealth == maxHealth && !allowOverheal)
+		{
+			return false;
+		}
+	
 		currentHealth += amount;
 		
 		if (currentHealth > maxHealth && !allowOverheal)

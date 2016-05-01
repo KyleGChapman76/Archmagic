@@ -20,7 +20,6 @@ public class MudPool : MonoBehaviour
 			}
 			else
 			{
-				print("Slowing target for " + slowTime + " at efficacy " + slowdownPercent);
 				MovementSlowDebuff debuff = collider.gameObject.AddComponent<MovementSlowDebuff>() as MovementSlowDebuff;
 				debuff.duration = slowTime;
 				debuff.slowPercent = slowdownPercent;

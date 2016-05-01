@@ -38,6 +38,7 @@ public class RockSpell : MonoBehaviour
 		{
 			mudBallProjectile.damage = (int)damage.GetValue();
 			mudBallProjectile.slowPercent = 4*(int)damage.GetValue();
+			mudBallProjectile.mudExplosionRadius = 3*sizeMult.GetValue();
 		}
 
 		Physics.IgnoreCollision(casterTransform.GetComponent<Collider>(), boulder.GetComponent<Collider>());

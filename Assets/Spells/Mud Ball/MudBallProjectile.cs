@@ -6,7 +6,11 @@ public class MudBallProjectile : MonoBehaviour {
 	public int damage;
 	public float slowPercent;
 	public float slowDuration;
+	public float explosionSlowPercentModifier;
+	public float explosionSlowDurationModifier;
 	public float gravityValue;
+
+	public float mudExplosionRadius;
 
 	private Rigidbody rb;
 
@@ -60,6 +64,33 @@ public class MudBallProjectile : MonoBehaviour {
 		else if (collisionRB)
 		{
 			rb.AddForce(currentRockVelocity * 200);
+		}
+	}
+
+	private void OnDestroy()
+	{
+		Collider[] colliders = Physics.OverlapSphere(transform.position, mudExplosionRadius);
+		foreach (Collider collider in colliders)
+		{
+			GameObject obj = collider.gameObject;
+
+			FPDPhysics physics = collider.GetComponent<FPDPhysics>();
+			if (physics)
+			{
+				MovementSlowDebuff currentDebuff = collider.GetComponent<MovementSlowDebuff>();
+				if (currentDebuff)
+				{
+					currentDebuff.duration = slowDuration * explosionSlowDurationModifier;
+					currentDebuff.slowPercent = slowPercent * explosionSlowPercentModifier;
+					currentDebuff.Reset();
+				}
+				else
+				{
+					MovementSlowDebuff debuff = collider.gameObject.AddComponent<MovementSlowDebuff>() as MovementSlowDebuff;
+					debuff.duration = slowDuration * explosionSlowPercentModifier;
+					debuff.slowPercent = slowPercent * explosionSlowPercentModifier;
+				}
+			}
 		}
 	}
 }
