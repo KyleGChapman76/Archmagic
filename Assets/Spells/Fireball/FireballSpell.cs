@@ -31,6 +31,7 @@ public class FireballSpell : MonoBehaviour
 		fireball.damage = (int)damage.GetValue();
 		fireball.duration = ballDuration;
 		fireball.explosionRadius = baseExplosionRadius * sizeMult.GetValue();
+		fireball.damageEachBurn = fireball.damage / 4;
 
 		Physics.IgnoreCollision(ball.GetComponent<Collider>(), casterTransform.GetComponent<Collider>());
 	}

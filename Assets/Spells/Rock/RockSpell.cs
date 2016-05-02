@@ -33,12 +33,19 @@ public class RockSpell : MonoBehaviour
 		if (projectileRock)
 			projectileRock.damage = (int)damage.GetValue();
 		if (projectileBomb)
+		{
 			projectileBomb.damage = (int)damage.GetValue();
+			projectileBomb.damageEachBurn = (int)(damage.GetValue() / 10f);
+			projectileBomb.timeBetweenBurnDamages = .5f;
+			projectileBomb.burnDuration = 3f;
+			projectileBomb.lavaPoolSizeMod = sizeMult.GetValue();
+        }
 		if (mudBallProjectile)
 		{
 			mudBallProjectile.damage = (int)damage.GetValue();
 			mudBallProjectile.slowPercent = 4*(int)damage.GetValue();
 			mudBallProjectile.mudExplosionRadius = 3*sizeMult.GetValue();
+			mudBallProjectile.mudPoolSizeMod = sizeMult.GetValue();
 		}
 
 		Physics.IgnoreCollision(casterTransform.GetComponent<Collider>(), boulder.GetComponent<Collider>());

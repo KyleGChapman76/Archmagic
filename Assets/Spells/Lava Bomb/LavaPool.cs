@@ -3,8 +3,6 @@ using System.Collections;
 
 public class LavaPool : MonoBehaviour
 {
-	public float damagePerTouch;
-
 	public float duration;
 	private float timer;
 
@@ -18,6 +16,10 @@ public class LavaPool : MonoBehaviour
 	public float flareLaunchHeight;
 	public float flareLaunchRadius;
     private float flareTimer;
+
+	public float burnDuration;
+	public float timeBetweenBurnDamages;
+	public int damageEachBurn;
 
 	private void Start()
 	{
@@ -54,8 +56,42 @@ public class LavaPool : MonoBehaviour
 		Health health = collider.gameObject.GetComponent<Health>();
 		if (health != null)
 		{
-			if (Random.Range(0, 100) < damagePerTouch * 100)
-				health.Damage(1);
+			DOTDebuff currentDebuff = collider.GetComponent<DOTDebuff>();
+			if (currentDebuff)
+			{
+				currentDebuff.damagePerTick = damageEachBurn;
+				currentDebuff.duration = burnDuration;
+				currentDebuff.timeBetweenDamages = timeBetweenBurnDamages;
+			}
+			else
+			{
+				DOTDebuff newDebuff = collider.gameObject.AddComponent<DOTDebuff>() as DOTDebuff;
+				newDebuff.damagePerTick = damageEachBurn;
+				newDebuff.duration = burnDuration;
+				newDebuff.timeBetweenDamages = timeBetweenBurnDamages;
+			}
+		}
+	}
+
+	private void OnTriggerExit(Collider collider)
+	{
+		Health health = collider.gameObject.GetComponent<Health>();
+		if (health != null)
+		{
+			DOTDebuff currentDebuff = collider.GetComponent<DOTDebuff>();
+			if (currentDebuff)
+			{
+				currentDebuff.damagePerTick = damageEachBurn/2;
+				currentDebuff.duration = burnDuration;
+				currentDebuff.timeBetweenDamages = timeBetweenBurnDamages*2f;
+			}
+			else
+			{
+				DOTDebuff newDebuff = collider.gameObject.AddComponent<DOTDebuff>() as DOTDebuff;
+				newDebuff.damagePerTick = damageEachBurn/2;
+				newDebuff.duration = burnDuration;
+				newDebuff.timeBetweenDamages = timeBetweenBurnDamages*2f;
+			}
 		}
 	}
 }

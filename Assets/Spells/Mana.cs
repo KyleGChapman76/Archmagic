@@ -72,6 +72,10 @@ public class Mana : MonoBehaviour
 
 	public bool SpendMana (int manaSpent)
 	{
+		if (manaSpent < 0)
+		{
+			return false;
+		}
 		if (currentMana >= manaSpent)
 		{
 			currentMana -= manaSpent;
@@ -89,5 +93,26 @@ public class Mana : MonoBehaviour
 	public void ResetMana()
 	{
 		currentMana = maxMana;
+	}
+
+	public bool RestoreMana(int manaRestore)
+	{
+		print("sdsadas");
+		if (manaRestore < 0)
+		{
+			return false;
+		}
+
+		if (currentMana == maxMana)
+		{
+			return false;
+		}
+
+		currentMana += manaRestore;
+
+		if (currentMana > maxMana)
+			currentMana = maxMana;
+
+		return true;
 	}
 }

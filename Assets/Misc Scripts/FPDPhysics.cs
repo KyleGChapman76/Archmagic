@@ -168,7 +168,6 @@ public class FPDPhysics: MonoBehaviour
 
 			if (hitCeiling)
 			{
-				print("Stopping on ceiling!");
 				velocity.y *= 0f;
             }
 		}

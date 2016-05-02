@@ -3,10 +3,14 @@ using System.Collections;
 
 public class Flame : MonoBehaviour
 {
-	public int damage;
+	public float damagePerHit;
 	public float timer;
 	public float duration;
 	public float increase;
+
+	public float burnDuration;
+	public float timeBetweenBurnDamages;
+	public int damageEachBurn;
 
 	private void Start ()
 	{
@@ -18,8 +22,24 @@ public class Flame : MonoBehaviour
 		Health health = collision.collider.GetComponent<Health>();
 		if (health)
 		{
-			health.Damage(damage);
-        }
+			if (Random.Range(0, 1) < damagePerHit)
+				health.Damage(1);
+
+			DOTDebuff currentDebuff = collision.collider.GetComponent<DOTDebuff>();
+			if (currentDebuff)
+			{
+				currentDebuff.damagePerTick = 1;
+				currentDebuff.duration = burnDuration;
+				currentDebuff.timeBetweenDamages = timeBetweenBurnDamages;
+            }
+			else
+			{
+				DOTDebuff newDebuff = collision.gameObject.AddComponent<DOTDebuff>() as DOTDebuff;
+				newDebuff.damagePerTick = damageEachBurn;
+				newDebuff.duration = burnDuration;
+				newDebuff.timeBetweenDamages = timeBetweenBurnDamages;
+			}
+		}
 		if (enabled && !collision.collider.name.Equals(gameObject.name))
 			Destroy(gameObject);
 	}

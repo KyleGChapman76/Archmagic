@@ -9,7 +9,7 @@ public class FlameSpell : MonoBehaviour
 	private int flameCount;
 	private float spread;
 	private float force;
-	public int damage;
+	public float damagePerHit;
 	public float flameDuration;
 	public float flameIncrease;
 
@@ -57,7 +57,7 @@ public class FlameSpell : MonoBehaviour
 
 				//set the flames other attributes
 				Flame flame = flameCube.GetComponent<Flame>() as Flame;
-				flame.damage = damage;
+				flame.damagePerHit = damagePerHit;
 				flame.duration = flameDuration * spreadValue.GetValue();
 				flame.increase = flameIncrease;
 

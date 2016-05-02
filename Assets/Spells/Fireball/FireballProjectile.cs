@@ -8,6 +8,10 @@ public class FireballProjectile : MonoBehaviour
 	public float explosionRadius;
 	private int timer;
 
+	public float burnDuration;
+	public float timeBetweenBurnDamages;
+	public int damageEachBurn;
+
 	public GameObject fireballExplosionPrefab;
 
 	private void Start ()
@@ -50,6 +54,21 @@ public class FireballProjectile : MonoBehaviour
 			{
 				health.Damage(damage);
 				obj.GetComponent<FPDPhysics>().Knockback(((obj.transform.position - transform.position).normalized + Vector3.up) * 10);
+
+				DOTDebuff currentDebuff = obj.GetComponent<DOTDebuff>();
+				if (currentDebuff)
+				{
+					currentDebuff.damagePerTick = 1;
+					currentDebuff.duration = burnDuration;
+					currentDebuff.timeBetweenDamages = timeBetweenBurnDamages;
+				}
+				else
+				{
+					DOTDebuff newDebuff = obj.AddComponent<DOTDebuff>() as DOTDebuff;
+					newDebuff.damagePerTick = damageEachBurn;
+					newDebuff.duration = burnDuration;
+					newDebuff.timeBetweenDamages = timeBetweenBurnDamages;
+				}
 			}
 		}
 	}

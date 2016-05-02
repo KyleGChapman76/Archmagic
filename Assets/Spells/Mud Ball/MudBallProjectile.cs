@@ -15,7 +15,9 @@ public class MudBallProjectile : MonoBehaviour {
 	private Rigidbody rb;
 
 	public GameObject mudPoolPrefab;
-	public LayerMask groundMask;
+	public Vector3 mudPoolDefaultSize;
+	public float mudPoolSizeMod;
+    public LayerMask groundMask;
 
 	private void FixedUpdate()
 	{
@@ -40,7 +42,10 @@ public class MudBallProjectile : MonoBehaviour {
 				MudPool poolProperties = mudPool.GetComponent<MudPool>();
 				poolProperties.slowdownPercent = slowPercent;
 				poolProperties.slowTime = slowDuration;
-            }
+
+				mudPool.transform.up = hit.normal;
+				mudPool.transform.localScale = mudPoolDefaultSize * mudPoolSizeMod;
+			}
 
 			Destroy(gameObject);
 		}
