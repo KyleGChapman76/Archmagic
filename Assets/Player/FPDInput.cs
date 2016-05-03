@@ -4,6 +4,7 @@ using System.Collections;
 public class FPDInput : MonoBehaviour
 {
 	public bool enableWalking = false;
+	public bool enableSprinting = false;
 
 	//whether or not input is disabled (while in a menu or somesuch)
 	private bool inputDisabled;
@@ -12,6 +13,7 @@ public class FPDInput : MonoBehaviour
 	private bool isJumping;
 	private float inputX;
 	private float inputY;
+	private bool isSprinting;
 
 	public void Start ()
 	{
@@ -23,6 +25,7 @@ public class FPDInput : MonoBehaviour
 		isJumping = Input.GetButton("Jump");
 		inputX = Input.GetAxis("Horizontal");
 		inputY = Input.GetAxis("Vertical");
+		isSprinting = Input.GetButton("Sprint");
 	}
 	
 	public float GetInputX ()
@@ -44,6 +47,13 @@ public class FPDInput : MonoBehaviour
 		if (!enableWalking || inputDisabled)
 			return false;
 		return isWalking;
+	}
+
+	public bool IsSprinting()
+	{
+		if (!enableSprinting || inputDisabled)
+			return false;
+		return isSprinting;
 	}
 	
 	public bool IsJumping ()

@@ -97,7 +97,6 @@ public class Mana : MonoBehaviour
 
 	public bool RestoreMana(int manaRestore)
 	{
-		print("sdsadas");
 		if (manaRestore < 0)
 		{
 			return false;

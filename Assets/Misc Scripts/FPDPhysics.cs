@@ -13,6 +13,7 @@ public class FPDPhysics: MonoBehaviour
 
 	public float walkSpeed = 6.0f;
     public float runSpeed = 10.0f;
+	public float sprintSpeed = 14f;
  
     public float jumpSpeed = 4.0f;
     public float gravity = 10.0f;
@@ -92,6 +93,7 @@ public class FPDPhysics: MonoBehaviour
 			inputX = fpdInput.GetInputX();
 			inputY = fpdInput.GetInputY();
 			speed = fpdInput.IsWalking() ? walkSpeed : runSpeed;
+			speed = fpdInput.IsSprinting() ? sprintSpeed : speed;
 			speed *= Mathf.Max(0f, multiplicativeMovementSpeed);
 			jumpAmount = fpdInput.IsJumping() ? 1 : 0;
 		}

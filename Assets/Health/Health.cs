@@ -34,11 +34,6 @@ public class Health : MonoBehaviour
 
 	private void Update ()
 	{
-		if (Input.GetButtonDown("Damage"))
-		{
-			currentHealth -= 5;
-		}
-
 		if (currentHealth <= 0)
 			alive = false;
 		if (!alive)

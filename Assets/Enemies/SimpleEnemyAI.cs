@@ -88,7 +88,7 @@ public class SimpleEnemyAI : MonoBehaviour
 			}
 			else if (!lostPlayerTarget)
 			{
-				hoverHeight = playerTarget.transform.position.y - (transform.position.y - distanceFromGround) + 2f;
+				hoverHeight = playerTarget.transform.position.y - (transform.position.y - distanceFromGround) + minimumHoverHeight;
 				hoverHeight = Mathf.Clamp(hoverHeight, minimumHoverHeight, maximumHoverHeight);
 
 				Ray rayToTarget = new Ray(transform.position, playerTarget.transform.position - transform.position);
