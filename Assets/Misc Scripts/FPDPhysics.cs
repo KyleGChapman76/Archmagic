@@ -4,8 +4,9 @@
 
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class FPDPhysics: MonoBehaviour
+public class FPDPhysics: NetworkBehaviour
 {
 	public FPDInput fpdInput;
 	public SimpleEnemyAI enemyAI;
@@ -78,6 +79,15 @@ public class FPDPhysics: MonoBehaviour
     {
         speed = walkSpeed;
         jumpTimer = antiBunnyHopFactor;
+			
+		if (!isLocalPlayer)
+		{
+			foreach (Transform child in this.GetComponentInChildren<Transform>())
+			{
+				Destroy(child.gameObject);
+			}
+			GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
+		}
     }
  
 	private void FixedUpdate()

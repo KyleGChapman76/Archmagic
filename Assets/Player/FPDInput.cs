@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class FPDInput : MonoBehaviour
+public class FPDInput : NetworkBehaviour
 {
 	public bool enableWalking = false;
 	public bool enableSprinting = false;
@@ -17,10 +18,18 @@ public class FPDInput : MonoBehaviour
 
 	public void Start ()
 	{
-	}
+		isWalking = false;
+		isJumping = false;
+		inputX = 0f;
+		inputY = 0f;
+		isSprinting = false;
+    }
 	
 	public void Update ()
 	{
+		if (!isLocalPlayer)
+			return;
+
 		isWalking = Input.GetButton("Walk");
 		isJumping = Input.GetButton("Jump");
 		inputX = Input.GetAxis("Horizontal");

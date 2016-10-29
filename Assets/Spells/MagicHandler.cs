@@ -2,13 +2,14 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Linq;
+using UnityEngine.Networking;
 
 public enum MagicElement
 {
 	VOID, FIRE, WATER, EARTH, AIR
 }
 
-public class MagicHandler : MonoBehaviour
+public class MagicHandler : NetworkBehaviour
 {
 	public const float UPGRADE_MANA_COST_INCREASE = 2.0f;
 	public float castingDelay = .1f;
@@ -41,7 +42,7 @@ public class MagicHandler : MonoBehaviour
 
 	GameObject aoeIndicator;
 
-	public GameObject spellPanel;
+	private GameObject spellPanel;
 	private GameObject[] spellSlots;
 
 	//whether each element is allowed to be used or not
@@ -87,6 +88,14 @@ public class MagicHandler : MonoBehaviour
 
 	private void Start()
 	{
+		if (!isLocalPlayer)
+		{
+			Destroy(this);
+			return;
+		}
+
+		spellPanel = GameObject.FindGameObjectWithTag("SpellPanel");
+
 		spellSlots = new GameObject[ScrollInventory.inventorySize];
 		int count = 0;
 		foreach (Transform child in spellPanel.transform)

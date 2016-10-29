@@ -25,6 +25,7 @@ public class Mana : MonoBehaviour
 	{
 		currentMana = maxMana;
 		timeBetweenManaGain = 1f / manaGainPerSecond;
+		manaText = GameObject.FindGameObjectWithTag("ManaText").GetComponent<Text>();
     }
 
 	private void Update ()
