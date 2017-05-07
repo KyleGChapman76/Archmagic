@@ -96,12 +96,18 @@ public class MagicHandler : NetworkBehaviour
 
 		spellPanel = GameObject.FindGameObjectWithTag("SpellPanel");
 
+		print("Can't find GameObject with tag SpellPanel");
+
 		spellSlots = new GameObject[ScrollInventory.inventorySize];
 		int count = 0;
-		foreach (Transform child in spellPanel.transform)
+
+		if (spellPanel != null)
 		{
-			spellSlots[count] = child.gameObject;
-			count++;
+			foreach (Transform child in spellPanel.transform)
+			{
+				spellSlots[count] = child.gameObject;
+				count++;
+			}
 		}
 
 		selectedElement1 = 1;
@@ -563,6 +569,10 @@ public class MagicHandler : NetworkBehaviour
 		for (int i = 0; i < elements.Length; i++)
 		{
 			GameObject spellSlot = spellSlots[i];
+
+			if (spellSlot == null)
+				continue;
+
 			Image spellSlotImage = spellSlot.GetComponent<Image>();
 			Text spellSlotText = spellSlot.GetComponentInChildren<Text>();
 
@@ -597,11 +607,12 @@ public class MagicHandler : NetworkBehaviour
 
 	public GameObject ActivateSpell(Spell spellBeingActivated, Vector3 targetingDirection, Vector3 targetingPoint, GameObject targetingUnit, bool upgrade)
 	{
-		if (spellBeingActivated)
+		if (spellBeingActivated != null)
 		{
 			GameObject spellInstantiation = null;
 
 			SpellTargetingType type = spellBeingActivated.GetTargetType();
+
 			int[] allocatedPoints = new int[3];
 			if (upgrade)
 				allocatedPoints = new int[3]{1,1,1};

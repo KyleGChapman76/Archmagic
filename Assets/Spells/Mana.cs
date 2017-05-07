@@ -25,7 +25,11 @@ public class Mana : MonoBehaviour
 	{
 		currentMana = maxMana;
 		timeBetweenManaGain = 1f / manaGainPerSecond;
-		manaText = GameObject.FindGameObjectWithTag("ManaText").GetComponent<Text>();
+
+		GameObject manaTextObject = GameObject.FindGameObjectWithTag("ManaText");
+
+		if (manaTextObject != null)
+			manaText = manaTextObject.GetComponent<Text>();
     }
 
 	private void Update ()
@@ -36,7 +40,8 @@ public class Mana : MonoBehaviour
 			regenTimer = 0;
 			GainMana(1);
 		}
-		manaText.text = currentMana + "";
+		if (manaText != null)
+			manaText.text = currentMana + "";
 	}
 
 	private void OnGUI()

@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class FireballSpell : MonoBehaviour
+public class FireballSpell : NetworkBehaviour
 {
 	public CustomizedValue force;
 	public CustomizedValue damage;
@@ -13,6 +14,11 @@ public class FireballSpell : MonoBehaviour
 
 	public void Start ()
 	{
+		if (!isLocalPlayer)
+		{
+			Destroy(this);
+			return;
+		}
 		//get targeting data
 		Vector3 forward = GetComponent<ProjectileTargeting>().GetDirection();
 		Transform casterTransform = transform.root.transform;
@@ -24,8 +30,8 @@ public class FireballSpell : MonoBehaviour
 		//set the balls size and velocity, etc
 		ball.transform.localScale *= sizeMult.GetValue();
 		Rigidbody ballRB = ball.GetComponent<Rigidbody>();
-        ballRB.AddForce(forward*force.GetValue());
-		
+		ballRB.AddForce(forward * force.GetValue());
+
 		//initialize the projectile properties
 		FireballProjectile fireball = ball.GetComponent<FireballProjectile>() as FireballProjectile;
 		fireball.damage = (int)damage.GetValue();
